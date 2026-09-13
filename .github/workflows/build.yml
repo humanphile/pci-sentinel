@@ -40,6 +40,20 @@ jobs:
         with:
           toolchain: stable
 
+      - name: Create sidecar binary stub
+        shell: bash
+        run: |
+          mkdir -p src-tauri/bin
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            FILE_PATH="src-tauri/bin/llama-server-aarch64-apple-darwin"
+          else
+            FILE_PATH="src-tauri/bin/llama-server-x86_64-pc-windows-msvc.exe"
+          fi
+          echo '#!/bin/sh' > "$FILE_PATH"
+          echo 'exit 0' >> "$FILE_PATH"
+          chmod +x "$FILE_PATH"
+          ls -la src-tauri/bin/
+
       - name: Build Tauri App
         run: npm run tauri build -- --verbose
 
