@@ -1,0 +1,277 @@
+{
+  "framework": "PCI DSS v4.0.1",
+  "requirement_id": 10,
+  "title": "Requirement 10: Log and Monitor All Access to System Components and Cardholder Data",
+  "controls": [
+    {
+      "control_id": "10.1.1",
+      "title_en": "Processes and mechanisms for logging and monitoring all access to system components and cardholder data are defined and understood.",
+      "mandate_text": "All security policies and operational procedures that are identified in Requirement 10 are: \n•\tDocumented.\n•\tKept up to date. \n•\tIn use.\n•\tKnown to all affected parties.",
+      "required_artifacts": [
+        "10_1_1_Policy.pdf",
+        "10_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.1.2",
+      "title_en": "Processes and mechanisms for logging and monitoring all access to system components and cardholder data are defined and understood.",
+      "mandate_text": "Roles and responsibilities for performing activities in Requirement 10 are documented, assigned, and understood.",
+      "required_artifacts": [
+        "10_1_2_Policy.pdf",
+        "10_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.2.1",
+      "title_en": "Audit logs are implemented to support the detection of anomalies and suspicious activity, and the forensic analysis of events.",
+      "mandate_text": "Audit logs are enabled and active for all system components and cardholder data.",
+      "required_artifacts": [
+        "10_2_1_Policy.pdf",
+        "10_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.2.1.1",
+      "title_en": "Audit logs are implemented to support the detection of anomalies and suspicious activity, and the forensic analysis of events.",
+      "mandate_text": "Audit logs capture all individual user access to cardholder data.",
+      "required_artifacts": [
+        "10_2_1_1_Policy.pdf",
+        "10_2_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.2.1.2",
+      "title_en": "Audit logs are implemented to support the detection of anomalies and suspicious activity, and the forensic analysis of events.",
+      "mandate_text": "Audit logs capture all actions taken by any individual with administrative access, including any interactive use of application or system accounts.",
+      "required_artifacts": [
+        "10_2_1_2_Policy.pdf",
+        "10_2_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.2.1.3",
+      "title_en": "Audit logs are implemented to support the detection of anomalies and suspicious activity, and the forensic analysis of events.",
+      "mandate_text": "Audit logs capture all access to audit logs.",
+      "required_artifacts": [
+        "10_2_1_3_Policy.pdf",
+        "10_2_1_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.2.1.4",
+      "title_en": "Audit logs are implemented to support the detection of anomalies and suspicious activity, and the forensic analysis of events.",
+      "mandate_text": "Audit logs capture all invalid logical access attempts.",
+      "required_artifacts": [
+        "10_2_1_4_Policy.pdf",
+        "10_2_1_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.2.1.5",
+      "title_en": "Audit logs are implemented to support the detection of anomalies and suspicious activity, and the forensic analysis of events.",
+      "mandate_text": "Audit logs capture all changes to identification and authentication credentials including, but not limited to:\n•\tCreation of new accounts.\n•\tElevation of privileges.\n•\tAll changes, additions, or deletions to accounts with administrative access.",
+      "required_artifacts": [
+        "10_2_1_5_Policy.pdf",
+        "10_2_1_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.2.1.6",
+      "title_en": "Audit logs are implemented to support the detection of anomalies and suspicious activity, and the forensic analysis of events.",
+      "mandate_text": "Audit logs capture the following: \n•\tAll initialization of new audit logs, and \n•\tAll starting, stopping, or pausing of the existing audit logs.",
+      "required_artifacts": [
+        "10_2_1_6_Policy.pdf",
+        "10_2_1_6_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.2.1.7",
+      "title_en": "Audit logs are implemented to support the detection of anomalies and suspicious activity, and the forensic analysis of events.",
+      "mandate_text": "Audit logs capture all creation and deletion of system-level objects.",
+      "required_artifacts": [
+        "10_2_1_7_Policy.pdf",
+        "10_2_1_7_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.2.2",
+      "title_en": "Audit logs are implemented to support the detection of anomalies and suspicious activity, and the forensic analysis of events.",
+      "mandate_text": "Audit logs record the following details for each auditable event:\n•\tUser identification.\n•\tType of event.\n•\tDate and time.\n•\tSuccess and failure indication.\n•\tOrigination of event.\n•\tIdentity or name of affected data, system component, resource, or service (for example, name and protocol).",
+      "required_artifacts": [
+        "10_2_2_Policy.pdf",
+        "10_2_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.3.1",
+      "title_en": "Audit logs are protected from destruction and unauthorized modifications.",
+      "mandate_text": "Read access to audit logs files is limited to those with a job-related need.",
+      "required_artifacts": [
+        "10_3_1_Policy.pdf",
+        "10_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.3.2",
+      "title_en": "Audit logs are protected from destruction and unauthorized modifications.",
+      "mandate_text": "Audit log files are protected to prevent modifications by individuals.",
+      "required_artifacts": [
+        "10_3_2_Policy.pdf",
+        "10_3_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.3.3",
+      "title_en": "Audit logs are protected from destruction and unauthorized modifications.",
+      "mandate_text": "Audit log files, including those for external-facing technologies, are promptly backed up to a secure, central, internal log server(s) or other media that is difficult to modify.",
+      "required_artifacts": [
+        "10_3_3_Policy.pdf",
+        "10_3_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.3.4",
+      "title_en": "Audit logs are protected from destruction and unauthorized modifications.",
+      "mandate_text": "File integrity monitoring or change-detection mechanisms is used on audit logs to ensure that existing log data cannot be changed without generating alerts.",
+      "required_artifacts": [
+        "10_3_4_Policy.pdf",
+        "10_3_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.4.1",
+      "title_en": "Audit logs are reviewed to identify anomalies or suspicious activity.",
+      "mandate_text": "The following audit logs are reviewed at least once daily:\n•\tAll security events. \n•\tLogs of all system components that store, process, or transmit CHD and/or SAD.\n•\tLogs of all critical system components.\n•\tLogs of all servers and system components that perform security functions (for example, network security controls, intrusion-detection systems/intrusion-prevention systems (IDS/IPS), authentication servers).",
+      "required_artifacts": [
+        "10_4_1_Policy.pdf",
+        "10_4_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.4.1.1",
+      "title_en": "Audit logs are reviewed to identify anomalies or suspicious activity.",
+      "mandate_text": "Automated mechanisms are used to perform audit log reviews.",
+      "required_artifacts": [
+        "10_4_1_1_Policy.pdf",
+        "10_4_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.4.2",
+      "title_en": "Audit logs are reviewed to identify anomalies or suspicious activity.",
+      "mandate_text": "Logs of all other system components (those not specified in Requirement 10.4.1) are reviewed periodically.",
+      "required_artifacts": [
+        "10_4_2_Policy.pdf",
+        "10_4_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.4.2.1",
+      "title_en": "Audit logs are reviewed to identify anomalies or suspicious activity.",
+      "mandate_text": "The frequency of periodic log reviews for all other system components (not defined in Requirement 10.4.1) is defined in the entity’s targeted risk analysis, which is performed according to all elements specified in Requirement 12.3.1",
+      "required_artifacts": [
+        "10_4_2_1_Policy.pdf",
+        "10_4_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.4.3",
+      "title_en": "Audit logs are reviewed to identify anomalies or suspicious activity.",
+      "mandate_text": "Exceptions and anomalies identified during the review process are addressed.",
+      "required_artifacts": [
+        "10_4_3_Policy.pdf",
+        "10_4_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.5.1",
+      "title_en": "Audit log history is retained and available for analysis.",
+      "mandate_text": "Retain audit log history for at least 12 months, with at least the most recent three months immediately available for analysis.",
+      "required_artifacts": [
+        "10_5_1_Policy.pdf",
+        "10_5_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.6.1",
+      "title_en": "Time-synchronization mechanisms support consistent time settings across all systems.",
+      "mandate_text": "System clocks and time are synchronized using time-synchronization technology.",
+      "required_artifacts": [
+        "10_6_1_Policy.pdf",
+        "10_6_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.6.2",
+      "title_en": "Time-synchronization mechanisms support consistent time settings across all systems.",
+      "mandate_text": "Systems are configured to the correct and consistent time as follows:\n•\tOne or more designated time servers are in use.\n•\tOnly the designated central time server(s) receives time from external sources.\n•\tTime received from external sources is based on International Atomic Time or Coordinated Universal Time (UTC).\n•\tThe designated time server(s) accept time updates only from specific industry-accepted external sources.\n•\tWhere there is more than one designated time server, the time servers peer with one another to keep accurate time.\n•\tInternal systems receive time information only from designated central time server(s).",
+      "required_artifacts": [
+        "10_6_2_Policy.pdf",
+        "10_6_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.6.3",
+      "title_en": "Time-synchronization mechanisms support consistent time settings across all systems.",
+      "mandate_text": "Time synchronization settings and data are protected as follows: \n•\tAccess to time data is restricted to only personnel with a business need.\n•\tAny changes to time settings on critical systems are logged, monitored, and reviewed.",
+      "required_artifacts": [
+        "10_6_3_Policy.pdf",
+        "10_6_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.7.1",
+      "title_en": "Failures of critical security control systems are detected, reported, and responded to promptly.",
+      "mandate_text": "Additional requirement for service providers only: Failures of critical security control systems are detected, alerted, and addressed promptly, including but not limited to failure of the following critical security control systems:\n•\tNetwork security controls. \n•\tIDS/IPS. \n•\tFIM. \n•\tAnti-malware solutions. \n•\tPhysical access controls. \n•\tLogical access controls. \n•\tAudit logging mechanisms. \n•\tSegmentation controls (if used).",
+      "required_artifacts": [
+        "10_7_1_Policy.pdf",
+        "10_7_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.7.2",
+      "title_en": "Failures of critical security control systems are detected, reported, and responded to promptly.",
+      "mandate_text": "Failures of critical security control systems are detected, alerted, and addressed promptly, including but not limited to failure of the following critical security control systems:\n•\tNetwork security controls.\n•\tIDS/IPS.\n•\tChange-detection mechanisms.\n•\tAnti-malware solutions.\n•\tPhysical access controls.\n•\tLogical access controls.\n•\tAudit logging mechanisms.\n•\tSegmentation controls (if used).\n•\tAudit log review mechanisms.\n•\tAutomated security testing tools (if used).",
+      "required_artifacts": [
+        "10_7_2_Policy.pdf",
+        "10_7_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "10.7.3",
+      "title_en": "Failures of critical security control systems are detected, reported, and responded to promptly.",
+      "mandate_text": "Failures of any critical security control systems are responded to promptly, including but not limited to: \n•\tRestoring security functions. \n•\tIdentifying and documenting the duration (date and time from start to end) of the security failure. \n•\tIdentifying and documenting the cause(s) of failure and documenting required remediation. \n•\tIdentifying and addressing any security issues that arose during the failure. \n•\tDetermining whether further actions are required as a result of the security failure. \n•\tImplementing controls to prevent the cause of failure from reoccurring. \n•\tResuming monitoring of security controls.",
+      "required_artifacts": [
+        "10_7_3_Policy.pdf",
+        "10_7_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    }
+  ]
+}

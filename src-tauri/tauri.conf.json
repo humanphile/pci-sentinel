@@ -1,0 +1,42 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "PCI-Sentinel",
+  "version": "1.0.0",
+  "identifier": "com.pci.sentinel",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1421",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "PCI-Sentinel | PCI DSS v4.0 Compliance Enclave",
+        "width": 1440,
+        "height": 900,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' ipc: http://ipc.localhost; connect-src 'self' ipc: http://ipc.localhost http://127.0.0.1:8090; img-src 'self' asset: data:; style-src 'self' 'unsafe-inline';"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["dmg", "app"],
+    "resources": [
+      "baselines/pci_dss/*"
+    ],
+    "externalBin": [
+      "bin/llama-server"
+    ],
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "12.0",
+      "entitlements": "Entitlements.plist",
+      "exceptionDomain": ""
+    }
+  }
+}

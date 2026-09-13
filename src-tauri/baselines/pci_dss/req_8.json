@@ -1,0 +1,297 @@
+{
+  "framework": "PCI DSS v4.0.1",
+  "requirement_id": 8,
+  "title": "Requirement 8: Identify Users and Authenticate Access to System Components",
+  "controls": [
+    {
+      "control_id": "8.1.1",
+      "title_en": "Processes and mechanisms for identifying users and authenticating access to system components are defined and understood.",
+      "mandate_text": "All security policies and operational procedures that are identified in Requirement 8 are:\n•\tDocumented.\n•\tKept up to date.\n•\tIn use.\n•\tKnown to all affected parties.",
+      "required_artifacts": [
+        "8_1_1_Policy.pdf",
+        "8_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.1.2",
+      "title_en": "Processes and mechanisms for identifying users and authenticating access to system components are defined and understood.",
+      "mandate_text": "Roles and responsibilities for performing activities in Requirement 8 are documented, assigned, and understood.",
+      "required_artifacts": [
+        "8_1_2_Policy.pdf",
+        "8_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.2.1",
+      "title_en": "User identification and related accounts for users and administrators are strictly managed throughout an account’s lifecycle.",
+      "mandate_text": "All users are assigned a unique ID before access to system components or cardholder data is allowed.",
+      "required_artifacts": [
+        "8_2_1_Policy.pdf",
+        "8_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.2.2",
+      "title_en": "User identification and related accounts for users and administrators are strictly managed throughout an account’s lifecycle.",
+      "mandate_text": "Group, shared, or generic IDs, or other shared authentication credentials are only used when necessary on an exception basis, and are managed as follows:\n•\tID use is prevented unless needed for an exceptional circumstance.\n•\tUse is limited to the time needed for the exceptional circumstance.\n•\tBusiness justification for use is documented.\n•\tUse is explicitly approved by management. \n•\tIndividual user identity is confirmed before access to an account is granted.\n•\tEvery action taken is attributable to an individual user.",
+      "required_artifacts": [
+        "8_2_2_Policy.pdf",
+        "8_2_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.2.3",
+      "title_en": "User identification and related accounts for users and administrators are strictly managed throughout an account’s lifecycle.",
+      "mandate_text": "Additional requirement for service providers only: Service providers with remote access to customer premises use unique authentication factors for each customer premises.",
+      "required_artifacts": [
+        "8_2_3_Policy.pdf",
+        "8_2_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.2.4",
+      "title_en": "User identification and related accounts for users and administrators are strictly managed throughout an account’s lifecycle.",
+      "mandate_text": "Addition, deletion, and modification of user IDs, authentication factors, and other identifier objects are managed as follows:\n•\tAuthorized with the appropriate approval.\n•\tImplemented with only the privileges specified on the documented approval.",
+      "required_artifacts": [
+        "8_2_4_Policy.pdf",
+        "8_2_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.2.5",
+      "title_en": "User identification and related accounts for users and administrators are strictly managed throughout an account’s lifecycle.",
+      "mandate_text": "Access for terminated users is immediately revoked.",
+      "required_artifacts": [
+        "8_2_5_Policy.pdf",
+        "8_2_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.2.6",
+      "title_en": "User identification and related accounts for users and administrators are strictly managed throughout an account’s lifecycle.",
+      "mandate_text": "Inactive user accounts are removed or disabled within 90 days of inactivity.",
+      "required_artifacts": [
+        "8_2_6_Policy.pdf",
+        "8_2_6_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.2.7",
+      "title_en": "User identification and related accounts for users and administrators are strictly managed throughout an account’s lifecycle.",
+      "mandate_text": "Accounts used by third parties to access, support, or maintain system components via remote access are managed as follows:\n•\tEnabled only during the time period needed and disabled when not in use.\n•\tUse is monitored for unexpected activity.",
+      "required_artifacts": [
+        "8_2_7_Policy.pdf",
+        "8_2_7_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.2.8",
+      "title_en": "User identification and related accounts for users and administrators are strictly managed throughout an account’s lifecycle.",
+      "mandate_text": "If a user session has been idle for more than 15 minutes, the user is required to re-authenticate to re-activate the terminal or session.",
+      "required_artifacts": [
+        "8_2_8_Policy.pdf",
+        "8_2_8_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.3.1",
+      "title_en": "Strong authentication for users and administrators is established and managed.",
+      "mandate_text": "All user access to system components for users and administrators is authenticated via at least one of the following authentication factors:\n•\tSomething you know, such as a password or passphrase.\n•\tSomething you have, such as a token device or smart card.\n•\tSomething you are, such as a biometric element.",
+      "required_artifacts": [
+        "8_3_1_Policy.pdf",
+        "8_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.3.2",
+      "title_en": "Strong authentication for users and administrators is established and managed.",
+      "mandate_text": "Strong cryptography is used to render all authentication factors unreadable during transmission and storage on all system components.",
+      "required_artifacts": [
+        "8_3_2_Policy.pdf",
+        "8_3_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.3.3",
+      "title_en": "Strong authentication for users and administrators is established and managed.",
+      "mandate_text": "User identity is verified before modifying any authentication factor.",
+      "required_artifacts": [
+        "8_3_3_Policy.pdf",
+        "8_3_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.3.4",
+      "title_en": "Strong authentication for users and administrators is established and managed.",
+      "mandate_text": "Invalid authentication attempts are limited by: \n•\tLocking out the user ID after not more than 10 attempts.\n•\tSetting the lockout duration to a minimum of 30 minutes or until the user’s identity is confirmed.",
+      "required_artifacts": [
+        "8_3_4_Policy.pdf",
+        "8_3_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.3.5",
+      "title_en": "Strong authentication for users and administrators is established and managed.",
+      "mandate_text": "If passwords/passphrases are used as authentication factors to meet Requirement 8.3.1, they are set and reset for each user as follows: \n•\tSet to a unique value for first-time use and upon reset.\n•\tForced to be changed immediately after the first use.",
+      "required_artifacts": [
+        "8_3_5_Policy.pdf",
+        "8_3_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.3.6",
+      "title_en": "Strong authentication for users and administrators is established and managed.",
+      "mandate_text": "If passwords/passphrases are used as authentication factors to meet Requirement 8.3.1, they meet the following minimum level of complexity: \n•\tA minimum length of 12 characters (or IF the system does not support 12 characters, a minimum length of eight characters).\n•\tContain both numeric and alphabetic characters.",
+      "required_artifacts": [
+        "8_3_6_Policy.pdf",
+        "8_3_6_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.3.7",
+      "title_en": "Strong authentication for users and administrators is established and managed.",
+      "mandate_text": "Individuals are not allowed to submit a new password/passphrase that is the same as any of the last four passwords/passphrases used.",
+      "required_artifacts": [
+        "8_3_7_Policy.pdf",
+        "8_3_7_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.3.8",
+      "title_en": "Strong authentication for users and administrators is established and managed.",
+      "mandate_text": "Authentication policies and procedures are documented and communicated to all users including: \n•\tGuidance on selecting strong authentication factors.\n•\tGuidance for how users should protect their authentication factors.\n•\tInstructions not to reuse previously used passwords/passphrases.\n•\tInstructions to change passwords/passphrases if there is any suspicion or knowledge that the password/passphrases have been compromised and how to report the incident.",
+      "required_artifacts": [
+        "8_3_8_Policy.pdf",
+        "8_3_8_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.3.9",
+      "title_en": "Strong authentication for users and administrators is established and managed.",
+      "mandate_text": "If passwords/passphrases are used as the only authentication factor for user access (i.e., in any single-factor authentication implementation) then either:\n•\tPasswords/passphrases are changed at least once every 90 days, \nOR\n•\tThe security posture of accounts is dynamically analyzed, and real-time access to resources is automatically determined accordingly.",
+      "required_artifacts": [
+        "8_3_9_Policy.pdf",
+        "8_3_9_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.3.10",
+      "title_en": "Strong authentication for users and administrators is established and managed.",
+      "mandate_text": "Additional requirement for service providers only: If passwords/passphrases are used as the only authentication factor for customer user access to cardholder data (i.e., in any single-factor authentication implementation), then guidance is provided to customer users including:\n•\tGuidance for customers to change their user passwords/passphrases periodically.\n•\tGuidance as to when, and under what circumstances, passwords/passphrases are to be changed.",
+      "required_artifacts": [
+        "8_3_10_Policy.pdf",
+        "8_3_10_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.3.10.1",
+      "title_en": "Strong authentication for users and administrators is established and managed.",
+      "mandate_text": "Additional requirement for service providers only: If passwords/passphrases are used as the only authentication factor for customer user access (i.e., in any single-factor authentication implementation) then either:\n•\tPasswords/passphrases are changed at least once every 90 days, \nOR\n•\tThe security posture of accounts is dynamically analyzed, and real-time access to resources is automatically determined accordingly.",
+      "required_artifacts": [
+        "8_3_10_1_Policy.pdf",
+        "8_3_10_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.3.11",
+      "title_en": "Strong authentication for users and administrators is established and managed.",
+      "mandate_text": "Where authentication factors such as physical or logical security tokens, smart cards, or certificates are used: \n•\tFactors are assigned to an individual user and not shared among multiple users. \n•\tPhysical and/or logical controls ensure only the intended user can use that factor to gain access.",
+      "required_artifacts": [
+        "8_3_11_Policy.pdf",
+        "8_3_11_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.4.1",
+      "title_en": "Multi-factor authentication (MFA) is implemented to secure access into the CDE.",
+      "mandate_text": "MFA is implemented for all non-console access into the CDE for personnel with administrative access.",
+      "required_artifacts": [
+        "8_4_1_Policy.pdf",
+        "8_4_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.4.2",
+      "title_en": "Multi-factor authentication (MFA) is implemented to secure access into the CDE.",
+      "mandate_text": "MFA is implemented for all non-console access into the CDE.",
+      "required_artifacts": [
+        "8_4_2_Policy.pdf",
+        "8_4_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.4.3",
+      "title_en": "Multi-factor authentication (MFA) is implemented to secure access into the CDE.",
+      "mandate_text": "MFA is implemented for all remote access originating from outside the entity’s network that could access or impact the CDE. ",
+      "required_artifacts": [
+        "8_4_3_Policy.pdf",
+        "8_4_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.5.1",
+      "title_en": "Multi-factor authentication (MFA) systems are configured to prevent misuse.",
+      "mandate_text": "MFA systems are implemented as follows:\n•\tThe MFA system is not susceptible to replay attacks.\n•\tMFA systems cannot be bypassed by any users, including administrative users unless specifically documented, and authorized by management on an exception basis, for a limited time period. \n•\tAt least two different types of authentication factors are used.\n•\tSuccess of all authentication factors is required before access is granted.",
+      "required_artifacts": [
+        "8_5_1_Policy.pdf",
+        "8_5_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.6.1",
+      "title_en": "Use of application and system accounts and associated authentication factors is strictly managed.",
+      "mandate_text": "If accounts used by systems or applications can be used for interactive login, they are managed as follows: \n•\tInteractive use is prevented unless needed for an exceptional circumstance.\n•\tInteractive use is limited to the time needed for the exceptional circumstance.\n•\tBusiness justification for interactive use is documented.\n•\tInteractive use is explicitly approved by management. \n•\tIndividual user identity is confirmed before access to account is granted.\n•\tEvery action taken is attributable to an individual user.",
+      "required_artifacts": [
+        "8_6_1_Policy.pdf",
+        "8_6_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.6.2",
+      "title_en": "Use of application and system accounts and associated authentication factors is strictly managed.",
+      "mandate_text": "Passwords/passphrases for any application and system accounts that can be used for interactive login are not hard coded in scripts, configuration / property files, or bespoke and custom source code.",
+      "required_artifacts": [
+        "8_6_2_Policy.pdf",
+        "8_6_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "8.6.3",
+      "title_en": "Use of application and system accounts and associated authentication factors is strictly managed.",
+      "mandate_text": "Passwords/passphrases for any application and system accounts are protected against misuse as follows: \n•\tPasswords/passphrases are changed periodically (at the frequency defined in the entity’s targeted risk analysis, which is performed according to all elements specified in Requirement 12.3.1) and upon suspicion or confirmation of compromise.\n•\tPasswords/passphrases are constructed with sufficient complexity appropriate for how frequently the entity changes the passwords/passphrases.",
+      "required_artifacts": [
+        "8_6_3_Policy.pdf",
+        "8_6_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    }
+  ]
+}

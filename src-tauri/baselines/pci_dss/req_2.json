@@ -1,0 +1,117 @@
+{
+  "framework": "PCI DSS v4.0.1",
+  "requirement_id": 2,
+  "title": "Requirement 2: Apply Secure Configurations to All System Components",
+  "controls": [
+    {
+      "control_id": "2.1.1",
+      "title_en": "Processes and mechanisms for applying secure configurations to all system components are defined and understood.",
+      "mandate_text": "All security policies and operational procedures that are identified in Requirement 2 are: \n•\tDocumented.\n•\tKept up to date.\n•\tIn use.\n•\tKnown to all affected parties.",
+      "required_artifacts": [
+        "2_1_1_Policy.pdf",
+        "2_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "2.1.2",
+      "title_en": "Processes and mechanisms for applying secure configurations to all system components are defined and understood.",
+      "mandate_text": "Roles and responsibilities for performing activities in Requirement 2 are documented, assigned, and understood.",
+      "required_artifacts": [
+        "2_1_2_Policy.pdf",
+        "2_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "2.2.1",
+      "title_en": "System components are configured and managed securely",
+      "mandate_text": "Configuration standards are developed, implemented, and maintained to:\n•\tCover all system components.\n•\tAddress all known security vulnerabilities. \n•\tBe consistent with industry-accepted system hardening standards or vendor hardening recommendations. \n•\tBe updated as new vulnerability issues are identified, as defined in Requirement 6.3.1.\n•\tBe applied when new systems are configured and verified as in place before or immediately after a system component is connected to a production environment.",
+      "required_artifacts": [
+        "2_2_1_Policy.pdf",
+        "2_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "2.2.2",
+      "title_en": "System components are configured and managed securely",
+      "mandate_text": "Vendor default accounts are managed as follows:\n•\tIf the vendor default account(s) will be used, the default password is changed per Requirement 8.3.6.\n•\tIf the vendor default account(s) will not be used, the account is removed or disabled.",
+      "required_artifacts": [
+        "2_2_2_Policy.pdf",
+        "2_2_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "2.2.3",
+      "title_en": "System components are configured and managed securely",
+      "mandate_text": "Primary functions requiring different security levels are managed as follows: \n•\tOnly one primary function exists on a system component,\nOR\n•\tPrimary functions with differing security levels that exist on the same system component are isolated from each other,\nOR\n•\tPrimary functions with differing security levels on the same system component are all secured to the level required by the function with the highest security need. ",
+      "required_artifacts": [
+        "2_2_3_Policy.pdf",
+        "2_2_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "2.2.4",
+      "title_en": "System components are configured and managed securely",
+      "mandate_text": "Only necessary services, protocols, daemons, and functions are enabled, and all unnecessary functionality is removed or disabled.",
+      "required_artifacts": [
+        "2_2_4_Policy.pdf",
+        "2_2_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "2.2.5",
+      "title_en": "System components are configured and managed securely",
+      "mandate_text": "If any insecure services, protocols, or daemons are present: \n•\tBusiness justification is documented.\n•\tAdditional security features are documented and implemented that reduce the risk of using insecure services, protocols, or daemons.",
+      "required_artifacts": [
+        "2_2_5_Policy.pdf",
+        "2_2_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "2.2.6",
+      "title_en": "System components are configured and managed securely",
+      "mandate_text": "System security parameters are configured to prevent misuse.",
+      "required_artifacts": [
+        "2_2_6_Policy.pdf",
+        "2_2_6_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "2.2.7",
+      "title_en": "System components are configured and managed securely",
+      "mandate_text": "All non-console administrative access is encrypted using strong cryptography.",
+      "required_artifacts": [
+        "2_2_7_Policy.pdf",
+        "2_2_7_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "2.3.1",
+      "title_en": "Wireless environments are configured and managed securely.",
+      "mandate_text": "For wireless environments connected to the CDE or transmitting account data, all wireless vendor defaults are changed at installation or are confirmed to be secure, including but not limited to:\n\n•\tDefault wireless encryption keys.\n•\tPasswords on wireless access points.\n•\tSNMP defaults.\n•\tAny other security-related wireless vendor defaults.",
+      "required_artifacts": [
+        "2_3_1_Policy.pdf",
+        "2_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "2.3.2",
+      "title_en": "Wireless environments are configured and managed securely.",
+      "mandate_text": "For wireless environments connected to the CDE or transmitting account data, wireless encryption keys are changed as follows: \n\n•\tWhenever personnel with knowledge of the key leave the company or the role for which the knowledge was necessary.\n•\tWhenever a key is suspected of or known to be compromised.",
+      "required_artifacts": [
+        "2_3_2_Policy.pdf",
+        "2_3_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    }
+  ]
+}

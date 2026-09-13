@@ -1,0 +1,67 @@
+{
+  "framework": "PCI DSS v4.0.1",
+  "requirement_id": 4,
+  "title": "Requirement 4: Protect Cardholder Data with Strong Cryptography During Transmission Over Open, Public Networks",
+  "controls": [
+    {
+      "control_id": "4.1.1",
+      "title_en": "Processes and mechanisms for protecting cardholder data with strong cryptography during transmission over open, public networks are defined and understood.",
+      "mandate_text": "All security policies and operational procedures that are identified in Requirement 4 are:\n•\tDocumented.\n•\tKept up to date.\n•\tIn use.\n•\tKnown to all affected parties.",
+      "required_artifacts": [
+        "4_1_1_Policy.pdf",
+        "4_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "4.1.2",
+      "title_en": "Processes and mechanisms for protecting cardholder data with strong cryptography during transmission over open, public networks are defined and understood.",
+      "mandate_text": "Roles and responsibilities for performing activities in Requirement 4 are documented, assigned, and understood.",
+      "required_artifacts": [
+        "4_1_2_Policy.pdf",
+        "4_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "4.2.1",
+      "title_en": "PAN is protected with strong cryptography during transmission.",
+      "mandate_text": "Strong cryptography and security protocols are implemented as follows to safeguard PAN during transmission over open, public networks:\n•\tOnly trusted keys and certificates are accepted.\n•\tCertificates used to safeguard PAN during transmission over open, public networks are confirmed as valid and are not expired or revoked. This bullet is a best practice until 31 March 2025, after which it will be required as part of Requirement 4.2.1 and must be fully considered during a PCI DSS assessment.\n•\tThe protocol in use supports only secure versions or configurations and does not support fallback to, or use of insecure versions, algorithms, key sizes, or implementations.\n•\tThe encryption strength is appropriate for the encryption methodology in use.",
+      "required_artifacts": [
+        "4_2_1_Policy.pdf",
+        "4_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "4.2.1.1",
+      "title_en": "PAN is protected with strong cryptography during transmission.",
+      "mandate_text": "An inventory of the entity’s trusted keys and certificates used to protect PAN during transmission is maintained.",
+      "required_artifacts": [
+        "4_2_1_1_Policy.pdf",
+        "4_2_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "4.2.1.2",
+      "title_en": "PAN is protected with strong cryptography during transmission.",
+      "mandate_text": "Wireless networks transmitting PAN or connected to the CDE use industry best practices to implement strong cryptography for authentication and transmission.",
+      "required_artifacts": [
+        "4_2_1_2_Policy.pdf",
+        "4_2_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "4.2.2",
+      "title_en": "PAN is protected with strong cryptography during transmission.",
+      "mandate_text": "PAN is secured with strong cryptography whenever it is sent via end-user messaging technologies.",
+      "required_artifacts": [
+        "4_2_2_Policy.pdf",
+        "4_2_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    }
+  ]
+}

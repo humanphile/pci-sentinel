@@ -1,0 +1,297 @@
+{
+  "framework": "PCI DSS v4.0.1",
+  "requirement_id": 3,
+  "title": "Requirement 3: Protect Stored Account Data",
+  "controls": [
+    {
+      "control_id": "3.1.1",
+      "title_en": "Processes and mechanisms for protecting stored account data are defined and understood.",
+      "mandate_text": "All security policies and operational procedures that are identified in Requirement 3 are:\n\n•\tDocumented.\n•\tKept up to date.\n•\tIn use.\n•\tKnown to all affected parties.",
+      "required_artifacts": [
+        "3_1_1_Policy.pdf",
+        "3_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.1.2",
+      "title_en": "Processes and mechanisms for protecting stored account data are defined and understood.",
+      "mandate_text": "System components that store cardholder data are not directly accessible from untrusted networks.",
+      "required_artifacts": [
+        "3_1_2_Policy.pdf",
+        "3_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.2.1",
+      "title_en": "Storage of account data is kept to a minimum.",
+      "mandate_text": "Account data storage is kept to a minimum through implementation of data retention and disposal policies, procedures, and processes that include at least the following:\n\n•\tCoverage for all locations of stored account data.\n•\tCoverage for any sensitive authentication data (SAD) stored prior to completion of authorization. This bullet is a best practice until 31 March 2025, after which it will be required as part of Requirement 3.2.1 and must be fully considered during a PCI DSS assessment. \n•\tLimiting data storage amount and retention time to that which is required for legal or regulatory, and/or business requirements. \n•\tSpecific retention requirements for stored account data that defines length of retention period and includes a documented business justification. \n•\tProcesses for secure deletion or rendering account data unrecoverable when no longer needed per the retention policy.\n•\tA process for verifying, at least once every three months, that stored account data exceeding the defined retention period has been securely deleted or rendered unrecoverable.",
+      "required_artifacts": [
+        "3_2_1_Policy.pdf",
+        "3_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.3.1",
+      "title_en": "Sensitive authentication data (SAD) is not stored after authorization.",
+      "mandate_text": "SAD is not stored after authorization, even if encrypted. All sensitive authentication data received is rendered unrecoverable upon completion of the authorization process.",
+      "required_artifacts": [
+        "3_3_1_Policy.pdf",
+        "3_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.3.1.1",
+      "title_en": "Sensitive authentication data (SAD) is not stored after authorization.",
+      "mandate_text": "The full contents of any track are not stored upon completion of the authorization process.",
+      "required_artifacts": [
+        "3_3_1_1_Policy.pdf",
+        "3_3_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.3.1.2",
+      "title_en": "Sensitive authentication data (SAD) is not stored after authorization.",
+      "mandate_text": "The card verification code is not stored upon completion of the authorization process.",
+      "required_artifacts": [
+        "3_3_1_2_Policy.pdf",
+        "3_3_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.3.1.3",
+      "title_en": "Sensitive authentication data (SAD) is not stored after authorization.",
+      "mandate_text": "The personal identification number (PIN) and the PIN block are not stored upon completion of the authorization process.",
+      "required_artifacts": [
+        "3_3_1_3_Policy.pdf",
+        "3_3_1_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.3.2",
+      "title_en": "Sensitive authentication data (SAD) is not stored after authorization.",
+      "mandate_text": "SAD that is stored electronically prior to completion of authorization is encrypted using strong cryptography.",
+      "required_artifacts": [
+        "3_3_2_Policy.pdf",
+        "3_3_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.3.3",
+      "title_en": "Sensitive authentication data (SAD) is not stored after authorization.",
+      "mandate_text": "Additional requirement for issuers and companies that support issuing services and store sensitive authentication data: Any storage of sensitive authentication data is:\n\n•\tLimited to that which is needed for a legitimate issuing business need and is secured. \n•\tEncrypted using strong cryptography.",
+      "required_artifacts": [
+        "3_3_3_Policy.pdf",
+        "3_3_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.4.1",
+      "title_en": "Access to displays of full PAN and ability to copy PAN are restricted.",
+      "mandate_text": "PAN is masked when displayed (the BIN and last four digits are the maximum number of digits to be displayed), such that only personnel with a legitimate business need can see more than the BIN and last four digits of the PAN.",
+      "required_artifacts": [
+        "3_4_1_Policy.pdf",
+        "3_4_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.4.2",
+      "title_en": "Access to displays of full PAN and ability to copy PAN are restricted.",
+      "mandate_text": "When using remote-access technologies, technical controls prevent copy and/or relocation of PAN for all personnel, except for those with documented, explicit authorization and a legitimate, defined business need",
+      "required_artifacts": [
+        "3_4_2_Policy.pdf",
+        "3_4_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.5.1",
+      "title_en": "Primary account number (PAN) is secured wherever it is stored.",
+      "mandate_text": "PAN is rendered unreadable anywhere it is stored by using any of the following approaches: \n•\tOne-way hashes based on strong cryptography of the entire PAN. \n•\tTruncation (hashing cannot be used to replace the truncated segment of PAN).\n–\tIf hashed and truncated versions of the same PAN, or different truncation formats of the same PAN, are present in an environment, additional controls are in place such that the different versions cannot be correlated to reconstruct the original PAN.\n•\tIndex tokens.\n•\tStrong cryptography with associated key-management processes and procedures.",
+      "required_artifacts": [
+        "3_5_1_Policy.pdf",
+        "3_5_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.5.1.1",
+      "title_en": "Primary account number (PAN) is secured wherever it is stored.",
+      "mandate_text": "Hashes used to render PAN unreadable (per the first bullet of Requirement 3.5.1) are keyed cryptographic hashes of the entire PAN, with associated key-management processes and procedures in accordance with Requirements 3.6 and 3.7.",
+      "required_artifacts": [
+        "3_5_1_1_Policy.pdf",
+        "3_5_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.5.1.2",
+      "title_en": "Primary account number (PAN) is secured wherever it is stored.",
+      "mandate_text": "If disk-level or partition-level encryption (rather than file-, column-, or field-level database encryption) is used to render PAN unreadable, it is implemented only as follows:\n•\tOn removable electronic media\nOR\n•\tIf used for non-removable electronic media, PAN is also rendered unreadable via another mechanism that meets Requirement 3.5.1.",
+      "required_artifacts": [
+        "3_5_1_2_Policy.pdf",
+        "3_5_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.5.1.3",
+      "title_en": "Primary account number (PAN) is secured wherever it is stored.",
+      "mandate_text": "If disk-level or partition-level encryption is used (rather than file-, column-, or field-level database encryption) to render PAN unreadable, it is managed as follows:\n•\tLogical access is managed separately and independently of native operating system authentication and access control mechanisms. \n•\tDecryption keys are not associated with user accounts.\n•\tAuthentication factors (passwords, passphrases, or cryptographic keys) that allow access to unencrypted data are stored securely.",
+      "required_artifacts": [
+        "3_5_1_3_Policy.pdf",
+        "3_5_1_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.6.1",
+      "title_en": "Cryptographic keys used to protect stored account data are secured.",
+      "mandate_text": "Procedures are defined and implemented to protect cryptographic keys used to protect stored account data against disclosure and misuse that include: \n•\tAccess to keys is restricted to the fewest number of custodians necessary. \n•\tKey-encrypting keys are at least as strong as the data-encrypting keys they protect. \n•\tKey-encrypting keys are stored separately from data-encrypting keys. \n•\tKeys are stored securely in the fewest possible locations and forms.",
+      "required_artifacts": [
+        "3_6_1_Policy.pdf",
+        "3_6_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.6.1.1",
+      "title_en": "Cryptographic keys used to protect stored account data are secured.",
+      "mandate_text": "Additional requirement for service providers only: A documented description of the cryptographic architecture is maintained that includes: \n•\tDetails of all algorithms, protocols, and keys used for the protection of stored account data, including key strength and expiry date. \n•\tPreventing the use of the same cryptographic keys in production and test environments. This bullet is a best practice until 31 March 2025, after which it will be required as part of Requirement 3.6.1 and must be fully considered during a PCI DSS assessment.\n•\tDescription of the key usage for each key. \n•\tInventory of any hardware security modules (HSMs), key management systems (KMS), and other secure cryptographic devices (SCDs) used for key management, including type and location of devices, to support meeting Requirement 12.3.4.",
+      "required_artifacts": [
+        "3_6_1_1_Policy.pdf",
+        "3_6_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.6.1.2",
+      "title_en": "Cryptographic keys used to protect stored account data are secured.",
+      "mandate_text": "Secret and private keys used to protect stored account data are stored in one (or more) of the following forms at all times: \n•\tEncrypted with a key-encrypting key that is at least as strong as the data-encrypting key, and that is stored separately from the data-encrypting key. \n•\tWithin a secure cryptographic device (SCD), such as a hardware security module (HSM) or PTS-approved point-of-interaction device. \n•\tAs at least two full-length key components or key shares, in accordance with an industry-accepted method.",
+      "required_artifacts": [
+        "3_6_1_2_Policy.pdf",
+        "3_6_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.6.1.3",
+      "title_en": "Cryptographic keys used to protect stored account data are secured.",
+      "mandate_text": "Access to cleartext cryptographic key components is restricted to the fewest number of custodians necessary.",
+      "required_artifacts": [
+        "3_6_1_3_Policy.pdf",
+        "3_6_1_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.6.1.4",
+      "title_en": "Cryptographic keys used to protect stored account data are secured.",
+      "mandate_text": "Cryptographic keys are stored in the fewest possible locations.",
+      "required_artifacts": [
+        "3_6_1_4_Policy.pdf",
+        "3_6_1_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.7.1",
+      "title_en": "Where cryptography is used to protect stored account data, key management processes and procedures covering all aspects of the key lifecycle are defined and implemented.",
+      "mandate_text": "Key-management policies and procedures are implemented to include generation of strong cryptographic keys used to protect stored account data.",
+      "required_artifacts": [
+        "3_7_1_Policy.pdf",
+        "3_7_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.7.2",
+      "title_en": "Where cryptography is used to protect stored account data, key management processes and procedures covering all aspects of the key lifecycle are defined and implemented.",
+      "mandate_text": "Key-management policies and procedures are implemented to include secure distribution of cryptographic keys used to protect stored account data.",
+      "required_artifacts": [
+        "3_7_2_Policy.pdf",
+        "3_7_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.7.3",
+      "title_en": "Where cryptography is used to protect stored account data, key management processes and procedures covering all aspects of the key lifecycle are defined and implemented.",
+      "mandate_text": "Key-management policies and procedures are implemented to include secure storage of cryptographic keys used to protect stored account data.",
+      "required_artifacts": [
+        "3_7_3_Policy.pdf",
+        "3_7_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.7.4",
+      "title_en": "Where cryptography is used to protect stored account data, key management processes and procedures covering all aspects of the key lifecycle are defined and implemented.",
+      "mandate_text": "Key management policies and procedures are implemented for cryptographic key changes for keys that have reached the end of their cryptoperiod, as defined by the associated application vendor or key owner, and based on industry best practices and guidelines, including the following:\n•\tA defined cryptoperiod for each key type in use.\n•\tA process for key changes at the end of the defined cryptoperiod.",
+      "required_artifacts": [
+        "3_7_4_Policy.pdf",
+        "3_7_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.7.5",
+      "title_en": "Where cryptography is used to protect stored account data, key management processes and procedures covering all aspects of the key lifecycle are defined and implemented.",
+      "mandate_text": "Key management policies procedures are implemented to include the retirement, replacement, or destruction of keys used to protect stored account data, as deemed necessary when: \n•\tThe key has reached the end of its defined cryptoperiod.\n•\tThe integrity of the key has been weakened, including when personnel with knowledge of a cleartext key component leaves the company, or the role for which the key component was known.\n•\tThe key is suspected of or known to be compromised. \n•\tRetired or replaced keys are not used for encryption operations.",
+      "required_artifacts": [
+        "3_7_5_Policy.pdf",
+        "3_7_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.7.6",
+      "title_en": "Where cryptography is used to protect stored account data, key management processes and procedures covering all aspects of the key lifecycle are defined and implemented.",
+      "mandate_text": "Where manual cleartext cryptographic key-management operations are performed by personnel, key-management policies and procedures are implemented, including managing these operations using split knowledge and dual control.",
+      "required_artifacts": [
+        "3_7_6_Policy.pdf",
+        "3_7_6_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.7.7",
+      "title_en": "Where cryptography is used to protect stored account data, key management processes and procedures covering all aspects of the key lifecycle are defined and implemented.",
+      "mandate_text": "Key management policies and procedures are implemented to include the prevention of unauthorized substitution of cryptographic keys.",
+      "required_artifacts": [
+        "3_7_7_Policy.pdf",
+        "3_7_7_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.7.8",
+      "title_en": "Where cryptography is used to protect stored account data, key management processes and procedures covering all aspects of the key lifecycle are defined and implemented.",
+      "mandate_text": "Key management policies and procedures are implemented to include that cryptographic key custodians formally acknowledge (in writing or electronically) that they understand and accept their key-custodian responsibilities.",
+      "required_artifacts": [
+        "3_7_8_Policy.pdf",
+        "3_7_8_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "3.7.9",
+      "title_en": "Where cryptography is used to protect stored account data, key management processes and procedures covering all aspects of the key lifecycle are defined and implemented.",
+      "mandate_text": "Additional requirement for service providers only: Where a service provider shares cryptographic keys with its customers for transmission or storage of account data, guidance on secure transmission, storage and updating of such keys is documented and distributed to the service provider’s customers.",
+      "required_artifacts": [
+        "3_7_9_Policy.pdf",
+        "3_7_9_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    }
+  ]
+}

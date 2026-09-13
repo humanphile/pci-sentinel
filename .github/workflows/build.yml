@@ -1,0 +1,47 @@
+name: Build PCI-Sentinel Windows & macOS
+
+on:
+  push:
+    branches: [ main, master, release/* ]
+    tags: [ 'v*']
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.platform }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+
+      - name: Install Node dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Setup Rust (MSVC / Apple)
+        uses: dtolnay/rust-action@stable
+
+      - name: Build Tauri App & Create Release/Artifacts
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: app-v__VERSION__
+          releaseName: 'PCI-Sentinel v__VERSION__'
+          releaseBody: 'Automated CI build artifact.'
+          releaseDraft: true
+          prerelease: false

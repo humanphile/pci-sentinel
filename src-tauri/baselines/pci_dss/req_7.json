@@ -1,0 +1,127 @@
+{
+  "framework": "PCI DSS v4.0.1",
+  "requirement_id": 7,
+  "title": "Requirement 7: Restrict Access to System Components and Cardholder Data by Business Need to Know",
+  "controls": [
+    {
+      "control_id": "7.1.1",
+      "title_en": "Processes and mechanisms for restricting access to system components and cardholder data by business need to know are defined and understood.",
+      "mandate_text": "All security policies and operational procedures that are identified in Requirement 7 are:\n•\tDocumented.\n•\tKept up to date.\n•\tIn use.\n•\tKnown to all affected parties.",
+      "required_artifacts": [
+        "7_1_1_Policy.pdf",
+        "7_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "7.1.2",
+      "title_en": "Processes and mechanisms for restricting access to system components and cardholder data by business need to know are defined and understood.",
+      "mandate_text": "Roles and responsibilities for performing activities in Requirement 7 are documented, assigned, and understood.",
+      "required_artifacts": [
+        "7_1_2_Policy.pdf",
+        "7_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "7.2.1",
+      "title_en": "Access to system components and data is appropriately defined and assigned.",
+      "mandate_text": "An access control model is defined and includes granting access as follows:\n•\tAppropriate access depending on the entity's business and access needs. \n•\tAccess to system components and data resources that is based on users' job classification and functions. \n•\tThe least privileges required (for example, user, administrator) to perform a job function.",
+      "required_artifacts": [
+        "7_2_1_Policy.pdf",
+        "7_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "7.2.2",
+      "title_en": "Access to system components and data is appropriately defined and assigned.",
+      "mandate_text": "Access is assigned to users, including privileged users, based on: \n•\tJob classification and function.\n•\tLeast privileges necessary to perform job responsibilities.",
+      "required_artifacts": [
+        "7_2_2_Policy.pdf",
+        "7_2_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "7.2.3",
+      "title_en": "Access to system components and data is appropriately defined and assigned.",
+      "mandate_text": "Required privileges are approved by authorized personnel. ",
+      "required_artifacts": [
+        "7_2_3_Policy.pdf",
+        "7_2_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "7.2.4",
+      "title_en": "Access to system components and data is appropriately defined and assigned.",
+      "mandate_text": "All user accounts and related access privileges, including third-party/vendor accounts, are reviewed as follows:\n•\tAt least once every six months.\n•\tTo ensure user accounts and access remain appropriate based on job function. \n•\tAny inappropriate access is addressed.\n•\tManagement acknowledges that access remains appropriate.",
+      "required_artifacts": [
+        "7_2_4_Policy.pdf",
+        "7_2_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "7.2.5",
+      "title_en": "Access to system components and data is appropriately defined and assigned.",
+      "mandate_text": "All application and system accounts and related access privileges are assigned and managed as follows:\n•\tBased on the least privileges necessary for the operability of the system or application.\n•\tAccess is limited to the systems, applications, or processes that specifically require their use.",
+      "required_artifacts": [
+        "7_2_5_Policy.pdf",
+        "7_2_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "7.2.5.1",
+      "title_en": "Access to system components and data is appropriately defined and assigned.",
+      "mandate_text": "All access by application and system accounts and related access privileges are reviewed as follows:\n•\tPeriodically (at the frequency defined in the entity's targeted risk analysis, which is performed according to all elements specified in Requirement 12.3.1).\n•\tThe application/system access remains appropriate for the function being performed. \n•\tAny inappropriate access is addressed.\n•\tManagement acknowledges that access remains appropriate.",
+      "required_artifacts": [
+        "7_2_5_1_Policy.pdf",
+        "7_2_5_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "7.2.6",
+      "title_en": "Access to system components and data is appropriately defined and assigned.",
+      "mandate_text": "All user access to query repositories of stored cardholder data is restricted as follows:\n•\tVia applications or other programmatic methods, with access and allowed actions based on user roles and least privileges.\n•\tOnly the responsible administrator(s) can directly access or query repositories of stored CHD.",
+      "required_artifacts": [
+        "7_2_6_Policy.pdf",
+        "7_2_6_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "7.3.1",
+      "title_en": "Access to system components and data is managed via an access control system(s).",
+      "mandate_text": "An access control system(s) is in place that restricts access based on a user’s need to know and covers all system components.",
+      "required_artifacts": [
+        "7_3_1_Policy.pdf",
+        "7_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "7.3.2",
+      "title_en": "Access to system components and data is managed via an access control system(s).",
+      "mandate_text": "The access control system(s) is configured to enforce permissions assigned to individuals, applications, and systems based on job classification and function.",
+      "required_artifacts": [
+        "7_3_2_Policy.pdf",
+        "7_3_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "7.3.3",
+      "title_en": "Access to system components and data is managed via an access control system(s).",
+      "mandate_text": "The access control system(s) is set to “deny all” by default.",
+      "required_artifacts": [
+        "7_3_3_Policy.pdf",
+        "7_3_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    }
+  ]
+}

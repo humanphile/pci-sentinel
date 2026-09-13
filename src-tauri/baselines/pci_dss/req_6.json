@@ -1,0 +1,197 @@
+{
+  "framework": "PCI DSS v4.0.1",
+  "requirement_id": 6,
+  "title": "Requirement 6: Develop and Maintain Secure Systems and Software",
+  "controls": [
+    {
+      "control_id": "6.1.1",
+      "title_en": "Processes and mechanisms for developing and maintaining secure systems and software are defined and understood.",
+      "mandate_text": "All security policies and operational procedures that are identified in Requirement 6 are:\n•\tDocumented.\n•\tKept up to date.\n•\tIn use.\n•\tKnown to all affected parties.",
+      "required_artifacts": [
+        "6_1_1_Policy.pdf",
+        "6_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.1.2",
+      "title_en": "Processes and mechanisms for developing and maintaining secure systems and software are defined and understood.",
+      "mandate_text": "Roles and responsibilities for performing activities in Requirement 6 are documented, assigned, and understood. ",
+      "required_artifacts": [
+        "6_1_2_Policy.pdf",
+        "6_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.2.1",
+      "title_en": "Bespoke and custom software are developed securely.",
+      "mandate_text": "Bespoke and custom software are developed securely, as follows:\n•\tBased on industry standards and/or best practices for secure development.\n•\tIn accordance with PCI DSS (for example, secure authentication and logging). \n•\tIncorporating consideration of information security issues during each stage of the software development lifecycle.",
+      "required_artifacts": [
+        "6_2_1_Policy.pdf",
+        "6_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.2.2",
+      "title_en": "Bespoke and custom software are developed securely.",
+      "mandate_text": "Software development personnel working on bespoke and custom software are trained at least once every 12 months as follows: \n•\tOn software security relevant to their job function and development languages.\n•\tIncluding secure software design and secure coding techniques.\n•\tIncluding, if security testing tools are used, how to use the tools for detecting vulnerabilities in software.",
+      "required_artifacts": [
+        "6_2_2_Policy.pdf",
+        "6_2_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.2.3",
+      "title_en": "Bespoke and custom software are developed securely.",
+      "mandate_text": "Bespoke and custom software is reviewed prior to being released into production or to customers, to identify and correct potential coding vulnerabilities, as follows:\n•\tCode reviews ensure code is developed according to secure coding guidelines.\n•\tCode reviews look for both existing and emerging software vulnerabilities.\n•\tAppropriate corrections are implemented prior to release.",
+      "required_artifacts": [
+        "6_2_3_Policy.pdf",
+        "6_2_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.2.3.1",
+      "title_en": "Bespoke and custom software are developed securely.",
+      "mandate_text": "If manual code reviews are performed for bespoke and custom software prior to release to production, code changes are:\n•\tReviewed by individuals other than the originating code author, and who are knowledgeable about code-review techniques and secure coding practices.\n•\tReviewed and approved by management prior to release.",
+      "required_artifacts": [
+        "6_2_3_1_Policy.pdf",
+        "6_2_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.2.4",
+      "title_en": "Bespoke and custom software are developed securely.",
+      "mandate_text": "Software engineering techniques or other methods are defined and in use by software development personnel to prevent or mitigate common software attacks and related vulnerabilities in bespoke and custom software, including but not limited to the following:\n•\tInjection attacks, including SQL, LDAP, XPath, or other command, parameter, object, fault, or injection-type flaws.\n•\tAttacks on data and data structures, including attempts to manipulate buffers, pointers, input data, or shared data.\n•\tAttacks on cryptography usage, including attempts to exploit weak, insecure, or inappropriate cryptographic implementations, algorithms, cipher suites, or modes of operation.\n•\tAttacks on business logic, including attempts to abuse or bypass application features and functionalities through the manipulation of APIs, communication protocols and channels, client-side functionality, or other system/application functions and resources. This includes cross-site scripting (XSS) and cross-site request forgery (CSRF).\n•\tAttacks on access control mechanisms, including attempts to bypass or abuse identification, authentication, or authorization mechanisms, or attempts to exploit weaknesses in the implementation of such mechanisms.\n•\tAttacks via any \"high-risk\" vulnerabilities identified in the vulnerability identification process, as defined in Requirement 6.3.1.",
+      "required_artifacts": [
+        "6_2_4_Policy.pdf",
+        "6_2_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.3.1",
+      "title_en": "Security vulnerabilities are identified and addressed.",
+      "mandate_text": "Security vulnerabilities are identified and managed as follows: \n•\tNew security vulnerabilities are identified using industry-recognized sources for security vulnerability information, including alerts from international and national computer emergency response teams (CERTs).\n•\tVulnerabilities are assigned a risk ranking based on industry best practices and consideration of potential impact. \n•\tRisk rankings identify, at a minimum, all vulnerabilities considered to be a high-risk or critical to the environment. \n•\tVulnerabilities for bespoke and custom, and third-party software (for example operating systems and databases) are covered.",
+      "required_artifacts": [
+        "6_3_1_Policy.pdf",
+        "6_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.3.2",
+      "title_en": "Security vulnerabilities are identified and addressed.",
+      "mandate_text": "An inventory of bespoke and custom software, and third-party software components incorporated into bespoke and custom software is maintained to facilitate vulnerability and patch management.",
+      "required_artifacts": [
+        "6_3_2_Policy.pdf",
+        "6_3_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.3.3",
+      "title_en": "Security vulnerabilities are identified and addressed.",
+      "mandate_text": "All system components are protected from known vulnerabilities by installing applicable security patches/updates as follows: \n•\tPatches/updates for critical vulnerabilities (identified according to the risk ranking process at Requirement 6.3.1) are installed within one month of release.\n•\tAll other applicable security patches/updates are installed within an appropriate time frame as determined by the entity’s assessment of the criticality of the risk to the environment as identified according to the risk ranking process at Requirement 6.3.1. ",
+      "required_artifacts": [
+        "6_3_3_Policy.pdf",
+        "6_3_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.4.1",
+      "title_en": "Public-facing web applications are protected against attacks.",
+      "mandate_text": "For public-facing web applications, new threats and vulnerabilities are addressed on an ongoing basis and these applications are protected against known attacks as follows:\n•\tReviewing public-facing web applications via manual or automated application vulnerability security assessment tools or methods as follows:\n–\tAt least once every 12 months and after significant changes.\n–\tBy an entity that specializes in application security.\n–\tIncluding, at a minimum, all common software attacks in Requirement 6.2.4.\n–\tAll vulnerabilities are ranked in accordance with requirement 6.3.1.\n–\tAll vulnerabilities are corrected.\n–\tThe application is re-evaluated after the corrections\nOR\n•\tInstalling an automated technical solution(s) that continually detects and prevents web-based attacks as follows:\n–\tInstalled in front of public-facing web applications to detect and prevent web-based attacks.\n–\tActively running and up to date as applicable.\n–\tGenerating audit logs. \n–\tConfigured to either block web-based attacks or generate an alert that is immediately investigated.",
+      "required_artifacts": [
+        "6_4_1_Policy.pdf",
+        "6_4_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.4.2",
+      "title_en": "Public-facing web applications are protected against attacks.",
+      "mandate_text": "For public-facing web applications, an automated technical solution is deployed that continually detects and prevents web-based attacks, with at least the following:\n•\tIs installed in front of public-facing web applications and is configured to detect and prevent web-based attacks.\n•\tActively running and up to date as applicable. \n•\tGenerating audit logs.\n•\tConfigured to either block web-based attacks or generate an alert that is immediately investigated.",
+      "required_artifacts": [
+        "6_4_2_Policy.pdf",
+        "6_4_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.4.3",
+      "title_en": "Public-facing web applications are protected against attacks.",
+      "mandate_text": "All payment page scripts that are loaded and executed in the consumer's browser are managed as follows:\n•\tA method is implemented to confirm that each script is authorized.\n•\tA method is implemented to assure the integrity of each script. \n•\tAn inventory of all scripts is maintained with written business or technical justification as to why each is necessary.",
+      "required_artifacts": [
+        "6_4_3_Policy.pdf",
+        "6_4_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.5.1",
+      "title_en": "Changes to all system components are managed securely.",
+      "mandate_text": "Changes to all system components in the production environment are made according to established procedures that include: \n•\tReason for, and description of, the change. \n•\tDocumentation of security impact. \n•\tDocumented change approval by authorized parties.\n•\tTesting to verify that the change does not adversely impact system security.\n•\tFor bespoke and custom software changes, all updates are tested for compliance with Requirement 6.2.4 before being deployed into production. \n•\tProcedures to address failures and return to a secure state.",
+      "required_artifacts": [
+        "6_5_1_Policy.pdf",
+        "6_5_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.5.2",
+      "title_en": "Changes to all system components are managed securely.",
+      "mandate_text": "Upon completion of a significant change, all applicable PCI DSS requirements are confirmed to be in place on all new or changed systems and networks, and documentation is updated as applicable.",
+      "required_artifacts": [
+        "6_5_2_Policy.pdf",
+        "6_5_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.5.3",
+      "title_en": "Changes to all system components are managed securely.",
+      "mandate_text": "Pre-production environments are separated from production environments and the separation is enforced with access controls.",
+      "required_artifacts": [
+        "6_5_3_Policy.pdf",
+        "6_5_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.5.4",
+      "title_en": "Changes to all system components are managed securely.",
+      "mandate_text": "Roles and functions are separated between production and pre-production environments to provide accountability such that only reviewed and approved changes are deployed.",
+      "required_artifacts": [
+        "6_5_4_Policy.pdf",
+        "6_5_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.5.5",
+      "title_en": "Changes to all system components are managed securely.",
+      "mandate_text": "Live PANs are not used in pre-production environments, except where those environments are included in the CDE and protected in accordance with all applicable PCI DSS requirements.",
+      "required_artifacts": [
+        "6_5_5_Policy.pdf",
+        "6_5_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "6.5.6",
+      "title_en": "Changes to all system components are managed securely.",
+      "mandate_text": "Test data and test accounts are removed from system components before the system goes into production.",
+      "required_artifacts": [
+        "6_5_6_Policy.pdf",
+        "6_5_6_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    }
+  ]
+}

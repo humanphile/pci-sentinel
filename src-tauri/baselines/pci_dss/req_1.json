@@ -1,0 +1,197 @@
+{
+  "framework": "PCI DSS v4.0.1",
+  "requirement_id": 1,
+  "title": "Requirement 1: Install and Maintain Network Security Controls",
+  "controls": [
+    {
+      "control_id": "1.1.1",
+      "title_en": "Processes and mechanisms for installing and maintaining network security controls are defined and understood.",
+      "mandate_text": "All security policies and operational procedures that are identified in Requirement 1 are: \n•\tDocumented.\n•\tKept up to date.\n•\tIn use.\n•\tKnown to all affected parties.",
+      "required_artifacts": [
+        "1_1_1_Policy.pdf",
+        "1_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.1.2",
+      "title_en": "Processes and mechanisms for installing and maintaining network security controls are defined and understood.",
+      "mandate_text": "Roles and responsibilities for performing activities in Requirement 1 are documented, assigned, and understood.",
+      "required_artifacts": [
+        "1_1_2_Policy.pdf",
+        "1_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.2.1",
+      "title_en": "Network security controls (NSCs) are configured and maintained.",
+      "mandate_text": "Configuration standards for NSC rulesets are:\n•\tDefined.\n•\tImplemented.\n•\tMaintained.",
+      "required_artifacts": [
+        "1_2_1_Policy.pdf",
+        "1_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.2.2",
+      "title_en": "Network security controls (NSCs) are configured and maintained.",
+      "mandate_text": "All changes to network connections and to configurations of NSCs are approved and managed in accordance with the change control process defined at Requirement 6.5.1. ",
+      "required_artifacts": [
+        "1_2_2_Policy.pdf",
+        "1_2_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.2.3",
+      "title_en": "Network security controls (NSCs) are configured and maintained.",
+      "mandate_text": "An accurate network diagram(s) is maintained that shows all connections between the CDE and other networks, including any wireless networks.",
+      "required_artifacts": [
+        "1_2_3_Policy.pdf",
+        "1_2_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.2.4",
+      "title_en": "Network security controls (NSCs) are configured and maintained.",
+      "mandate_text": "An accurate data-flow diagram(s) is maintained that meets the following:\n•\tShows all account data flows across systems and networks.\n•\tUpdated as needed upon changes to the environment.",
+      "required_artifacts": [
+        "1_2_4_Policy.pdf",
+        "1_2_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.2.5",
+      "title_en": "Network security controls (NSCs) are configured and maintained.",
+      "mandate_text": "All services, protocols, and ports allowed are identified, approved, and have a defined business need.",
+      "required_artifacts": [
+        "1_2_5_Policy.pdf",
+        "1_2_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.2.6",
+      "title_en": "Network security controls (NSCs) are configured and maintained.",
+      "mandate_text": "Security features are defined and implemented for all services, protocols, and ports that are in use and considered to be insecure, such that the risk is mitigated.",
+      "required_artifacts": [
+        "1_2_6_Policy.pdf",
+        "1_2_6_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.2.7",
+      "title_en": "Network security controls (NSCs) are configured and maintained.",
+      "mandate_text": "Configurations of NSCs are reviewed at least once every six months to confirm they are relevant and effective.",
+      "required_artifacts": [
+        "1_2_7_Policy.pdf",
+        "1_2_7_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.2.8",
+      "title_en": "Network security controls (NSCs) are configured and maintained.",
+      "mandate_text": "Configuration files for NSCs are: \n•\tSecured from unauthorized access. \n•\tKept consistent with active network configurations. ",
+      "required_artifacts": [
+        "1_2_8_Policy.pdf",
+        "1_2_8_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.3.1",
+      "title_en": "Network access to and from the cardholder data environment is restricted.",
+      "mandate_text": "Inbound traffic to the CDE is restricted as follows: \n•\tTo only traffic that is necessary. \n•\tAll other traffic is specifically denied.",
+      "required_artifacts": [
+        "1_3_1_Policy.pdf",
+        "1_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.3.2",
+      "title_en": "Network access to and from the cardholder data environment is restricted.",
+      "mandate_text": "Outbound traffic from the CDE is restricted as follows: \n•\tTo only traffic that is necessary.\n•\tAll other traffic is specifically denied.",
+      "required_artifacts": [
+        "1_3_2_Policy.pdf",
+        "1_3_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.3.3",
+      "title_en": "Network access to and from the cardholder data environment is restricted.",
+      "mandate_text": "NSCs are installed between all wireless networks and the CDE, regardless of whether the wireless network is a CDE, such that: \n•\tAll wireless traffic from wireless networks into the CDE is denied by default.\n•\tOnly wireless traffic with an authorized business purpose is allowed into the CDE.",
+      "required_artifacts": [
+        "1_3_3_Policy.pdf",
+        "1_3_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.4.1",
+      "title_en": "Network connections between trusted and untrusted networks are controlled.",
+      "mandate_text": "NSCs are implemented between trusted and untrusted networks.",
+      "required_artifacts": [
+        "1_4_1_Policy.pdf",
+        "1_4_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.4.2",
+      "title_en": "Network connections between trusted and untrusted networks are controlled.",
+      "mandate_text": "Inbound traffic from untrusted networks to trusted networks is restricted to: \n•\tCommunications with system components that are authorized to provide publicly accessible services, protocols, and ports.\n•\tStateful responses to communications initiated by system components in a trusted network.\n•\tAll other traffic is denied.",
+      "required_artifacts": [
+        "1_4_2_Policy.pdf",
+        "1_4_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.4.3",
+      "title_en": "Network connections between trusted and untrusted networks are controlled.",
+      "mandate_text": "Anti-spoofing measures are implemented to detect, and block forged source IP addresses from entering the trusted network.",
+      "required_artifacts": [
+        "1_4_3_Policy.pdf",
+        "1_4_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.4.4",
+      "title_en": "Network connections between trusted and untrusted networks are controlled.",
+      "mandate_text": "System components that store cardholder data are not directly accessible from untrusted networks.",
+      "required_artifacts": [
+        "1_4_4_Policy.pdf",
+        "1_4_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.4.5",
+      "title_en": "Network connections between trusted and untrusted networks are controlled.",
+      "mandate_text": "The disclosure of internal IP addresses and routing information is limited to only authorized parties.",
+      "required_artifacts": [
+        "1_4_5_Policy.pdf",
+        "1_4_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "1.5.1",
+      "title_en": "Risks to the CDE from computing devices that are able to connect to both untrusted networks and the CDE are mitigated.",
+      "mandate_text": "Security controls are implemented on any computing devices, including company- and employee-owned devices, that connect to both untrusted networks (including the Internet) and the CDE as follows: \n•\tSpecific configuration settings are defined to prevent threats being introduced into the entity’s network. \n•\tSecurity controls are actively running.\n•\tSecurity controls are not alterable by users of the computing devices unless specifically documented and authorized by management on a case-by-case basis for a limited period.",
+      "required_artifacts": [
+        "1_5_1_Policy.pdf",
+        "1_5_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    }
+  ]
+}

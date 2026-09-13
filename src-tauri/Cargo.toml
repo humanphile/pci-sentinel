@@ -1,0 +1,29 @@
+[package]
+name = "pci-sentinel"
+version = "1.0.0"
+description = "PCI DSS v4.0.1 Air-Gapped Sentinel"
+authors = ["Ahmad Adnan"]
+edition = "2021"
+
+[lib]
+name = "pci_sentinel_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+reqwest = { version = "0.12", features = ["json"] }
+sha2 = "0.10"
+tauri = { version = "2", features = [] }
+tauri-plugin-shell = "2"
+chrono = { version = "0.4", features = ["clock"] }
+base64 = "0.22"
+dirs = "5"
+rusqlite = { version = "0.31", features = ["bundled"] }
+
+# Cryptographic Enclave
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+rand = "0.8"

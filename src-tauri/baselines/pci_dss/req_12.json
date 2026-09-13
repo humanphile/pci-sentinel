@@ -1,0 +1,377 @@
+{
+  "framework": "PCI DSS v4.0.1",
+  "requirement_id": 12,
+  "title": "Requirement 12: Support Information Security with Organizational Policies and Programs",
+  "controls": [
+    {
+      "control_id": "12.1.1",
+      "title_en": "A comprehensive information security policy that governs and provides direction for protection of the entity’s information assets is known and current",
+      "mandate_text": "An overall information security policy is: \n•\tEstablished. \n•\tPublished.\n•\tMaintained.\n•\tDisseminated to all relevant personnel, as well as to relevant vendors and business partners.",
+      "required_artifacts": [
+        "12_1_1_Policy.pdf",
+        "12_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.1.2",
+      "title_en": "A comprehensive information security policy that governs and provides direction for protection of the entity’s information assets is known and current",
+      "mandate_text": "The information security policy is:\n•\tReviewed at least once every 12 months.\n•\tUpdated as needed to reflect changes to business objectives or risks to the environment.",
+      "required_artifacts": [
+        "12_1_2_Policy.pdf",
+        "12_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.1.3",
+      "title_en": "A comprehensive information security policy that governs and provides direction for protection of the entity’s information assets is known and current",
+      "mandate_text": "The security policy clearly defines information security roles and responsibilities for all personnel, and all personnel are aware of and acknowledge their information security responsibilities.",
+      "required_artifacts": [
+        "12_1_3_Policy.pdf",
+        "12_1_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.1.4",
+      "title_en": "A comprehensive information security policy that governs and provides direction for protection of the entity’s information assets is known and current",
+      "mandate_text": "Responsibility for information security is formally assigned to a Chief Information Security Officer or other information security knowledgeable member of executive management.",
+      "required_artifacts": [
+        "12_1_4_Policy.pdf",
+        "12_1_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.2.1",
+      "title_en": "Acceptable use policies for end-user technologies are defined and implemented.",
+      "mandate_text": "Acceptable use policies for end-user technologies are documented and implemented, including:\n•\tExplicit approval by authorized parties.\n•\tAcceptable uses of the technology.\n•\tList of products approved by the company for employee use, including hardware and software.",
+      "required_artifacts": [
+        "12_2_1_Policy.pdf",
+        "12_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.3.1",
+      "title_en": "Risks to the cardholder data environment are formally identified, evaluated, and managed.",
+      "mandate_text": "For each PCI DSS requirement that specifies completion of a targeted risk analysis, the analysis is documented and includes: \n•\tIdentification of the assets being protected. \n•\tIdentification of the threat(s) that the requirement is protecting against.\n•\tIdentification of factors that contribute to the likelihood and/or impact of a threat being realized. \n•\tResulting analysis that determines, and includes justification for, how the frequency or processes defined by the entity to meet the requirement minimize the likelihood and/or impact of the threat being realized.\n•\tReview of each targeted risk analysis at least once every 12 months to determine whether the results are still valid or if an updated risk analysis is needed.\n•\tPerformance of updated risk analyses when needed, as determined by the annual review.",
+      "required_artifacts": [
+        "12_3_1_Policy.pdf",
+        "12_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.3.2",
+      "title_en": "Risks to the cardholder data environment are formally identified, evaluated, and managed.",
+      "mandate_text": "A targeted risk analysis is performed for each PCI DSS requirement that the entity meets with the customized approach, to include:\n•\tDocumented evidence detailing each element specified in Appendix D: Customized Approach (including, at a minimum, a controls matrix and risk analysis).\n•\tApproval of documented evidence by senior management.\n•\tPerformance of the targeted analysis of risk at least once every 12 months.",
+      "required_artifacts": [
+        "12_3_2_Policy.pdf",
+        "12_3_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.3.3",
+      "title_en": "Risks to the cardholder data environment are formally identified, evaluated, and managed.",
+      "mandate_text": "Cryptographic cipher suites and protocols in use are documented and reviewed at least once every 12 months, including at least the following:\n•\tAn up-to-date inventory of all cryptographic cipher suites and protocols in use, including purpose and where used.\n•\tActive monitoring of industry trends regarding continued viability of all cryptographic cipher suites and protocols in use.\n•\tDocumentation of a plan to respond to anticipated changes in cryptographic vulnerabilities.",
+      "required_artifacts": [
+        "12_3_3_Policy.pdf",
+        "12_3_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.3.4",
+      "title_en": "Risks to the cardholder data environment are formally identified, evaluated, and managed.",
+      "mandate_text": " Hardware and software technologies in use are reviewed at least once every 12 months, including at least the following:\n•\tAnalysis that the technologies continue to receive security fixes from vendors promptly.\n•\tAnalysis that the technologies continue to support (and do not preclude) the entity’s PCI DSS compliance.\n•\tDocumentation of any industry announcements or trends related to a technology, such as when a vendor has announced “end of life” plans for a technology.\n•\tDocumentation of a plan, approved by senior management, to remediate outdated technologies, including those for which vendors have announced “end of life” plans.",
+      "required_artifacts": [
+        "12_3_4_Policy.pdf",
+        "12_3_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.4.1",
+      "title_en": "PCI DSS compliance is managed.",
+      "mandate_text": "Additional requirement for service providers only: Responsibility is established by executive management for the protection of cardholder data and a PCI DSS compliance program to include: \n•\tOverall accountability for maintaining PCI DSS compliance.\n•\tDefining a charter for a PCI DSS compliance program and communication to executive management.",
+      "required_artifacts": [
+        "12_4_1_Policy.pdf",
+        "12_4_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.4.2",
+      "title_en": "PCI DSS compliance is managed.",
+      "mandate_text": "Additional requirement for service providers only: Reviews are performed at least once every three months to confirm that personnel are performing their tasks in accordance with all security policies and operational procedures. Reviews are performed by personnel other than those responsible for performing the given task and include, but are not limited to, the following tasks: \n•\tDaily log reviews. \n•\tConfiguration reviews for network security controls. \n•\tApplying configuration standards to new systems. \n•\tResponding to security alerts. \n•\tChange-management processes.",
+      "required_artifacts": [
+        "12_4_2_Policy.pdf",
+        "12_4_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.4.2.1",
+      "title_en": "PCI DSS compliance is managed.",
+      "mandate_text": "Additional requirement for service providers only: Reviews conducted in accordance with Requirement 12.4.2 are documented to include: \n•\tResults of the reviews. \n•\tDocumented remediation actions taken for any tasks that were found to not be performed at Requirement 12.4.2.\n•\tReview and sign-off of results by personnel assigned responsibility for the PCI DSS compliance program.",
+      "required_artifacts": [
+        "12_4_2_1_Policy.pdf",
+        "12_4_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.5.1",
+      "title_en": "PCI DSS scope is documented and validated.",
+      "mandate_text": "An inventory of system components that are in scope for PCI DSS, including a description of function/use, is maintained and kept current.",
+      "required_artifacts": [
+        "12_5_1_Policy.pdf",
+        "12_5_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.5.2",
+      "title_en": "PCI DSS scope is documented and validated.",
+      "mandate_text": "PCI DSS scope is documented and confirmed by the entity at least once every 12 months and upon significant change to the in-scope environment. At a minimum, the scoping validation includes:\n•\tIdentifying all data flows for the various payment stages (for example, authorization, capture settlement, chargebacks, and refunds) and acceptance channels (for example, card-present, card-not-present, and e-commerce).\n•\tUpdating all data-flow diagrams per Requirement 1.2.4.\n•\tIdentifying all locations where account data is stored, processed, and transmitted, including but not limited to: 1) any locations outside of the currently defined CDE, 2) applications that process CHD, 3) transmissions between systems and networks, and 4) file backups.\n•\tIdentifying all system components in the CDE, connected to the CDE, or that could impact security of the CDE.\n•\tIdentifying all segmentation controls in use and the environment(s) from which the CDE is segmented, including justification for environments being out of scope.\n•\tIdentifying all connections from third-party entities with access to the CDE.\n•\tConfirming that all identified data flows, account data, system components, segmentation controls, and connections from third parties with access to the CDE are included in scope.",
+      "required_artifacts": [
+        "12_5_2_Policy.pdf",
+        "12_5_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.5.2.1",
+      "title_en": "PCI DSS scope is documented and validated.",
+      "mandate_text": "Additional requirement for service providers only: PCI DSS scope is documented and confirmed by the entity at least once every six months and upon significant change to the in-scope environment. At a minimum, the scoping validation includes all the elements specified in Requirement 12.5.2.",
+      "required_artifacts": [
+        "12_5_2_1_Policy.pdf",
+        "12_5_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.5.3",
+      "title_en": "PCI DSS scope is documented and validated.",
+      "mandate_text": "Additional requirement for service providers only: Significant changes to organizational structure result in a documented (internal) review of the impact to PCI DSS scope and applicability of controls, with results communicated to executive management.",
+      "required_artifacts": [
+        "12_5_3_Policy.pdf",
+        "12_5_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.6.1",
+      "title_en": "Security awareness education is an ongoing activity.",
+      "mandate_text": "A formal security awareness program is implemented to make all personnel aware of the entity’s information security policy and procedures, and their role in protecting the cardholder data.",
+      "required_artifacts": [
+        "12_6_1_Policy.pdf",
+        "12_6_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.6.2",
+      "title_en": "Security awareness education is an ongoing activity.",
+      "mandate_text": "The security awareness program is: \n•\tReviewed at least once every 12 months, and \n•\tUpdated as needed to address any new threats and vulnerabilities that may impact the security of the entity's cardholder data and/or sensitive authentication data, or the information provided to personnel about their role in protecting cardholder data.",
+      "required_artifacts": [
+        "12_6_2_Policy.pdf",
+        "12_6_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.6.3",
+      "title_en": "Security awareness education is an ongoing activity.",
+      "mandate_text": "Personnel receive security awareness training as follows: \n•\tUpon hire and at least once every 12 months.\n•\tMultiple methods of communication are used.\n•\tPersonnel acknowledge at least once every 12 months that they have read and understood the information security policy and procedures.",
+      "required_artifacts": [
+        "12_6_3_Policy.pdf",
+        "12_6_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.6.3.1",
+      "title_en": "Security awareness education is an ongoing activity.",
+      "mandate_text": "Security awareness training includes awareness of threats and vulnerabilities that could impact the security of cardholder data and/or sensitive authentication data, including but not limited to:\n•\tPhishing and related attacks. \n•\tSocial engineering.",
+      "required_artifacts": [
+        "12_6_3_1_Policy.pdf",
+        "12_6_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.6.3.2",
+      "title_en": "Security awareness education is an ongoing activity.",
+      "mandate_text": "Security awareness training includes awareness about the acceptable use of end-user technologies in accordance with Requirement 12.2.1.",
+      "required_artifacts": [
+        "12_6_3_2_Policy.pdf",
+        "12_6_3_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.7.1",
+      "title_en": "Personnel are screened to reduce risks from insider threats.",
+      "mandate_text": "Potential personnel who will have access to the CDE are screened, within the constraints of local laws, prior to hire to minimize the risk of attacks from internal sources.",
+      "required_artifacts": [
+        "12_7_1_Policy.pdf",
+        "12_7_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.8.1",
+      "title_en": "Risk to information assets associated with third-party service provider (TPSP) relationships is managed.",
+      "mandate_text": "A list of all third-party service providers (TPSPs) with which account data is shared or that could affect the security of account data is maintained, including a description for each of the services provided.",
+      "required_artifacts": [
+        "12_8_1_Policy.pdf",
+        "12_8_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.8.2",
+      "title_en": "Risk to information assets associated with third-party service provider (TPSP) relationships is managed.",
+      "mandate_text": "Written agreements with TPSPs are maintained as follows: \n•\tWritten agreements are maintained with all TPSPs with which account data is shared or that could affect the security of the CDE.\n•\tWritten agreements include acknowledgments from TPSPs that TPSPs are responsible for the security of account data the TPSPs possess or otherwise store, process, or transmit on behalf of the entity, or to the extent that the TPSP could impact the security of the entity's cardholder data and/or sensitive authentication data.",
+      "required_artifacts": [
+        "12_8_2_Policy.pdf",
+        "12_8_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.8.3",
+      "title_en": "Risk to information assets associated with third-party service provider (TPSP) relationships is managed.",
+      "mandate_text": "An established process is implemented for engaging TPSPs, including proper due diligence prior to engagement.",
+      "required_artifacts": [
+        "12_8_3_Policy.pdf",
+        "12_8_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.8.4",
+      "title_en": "Risk to information assets associated with third-party service provider (TPSP) relationships is managed.",
+      "mandate_text": "A program is implemented to monitor TPSPs’ PCI DSS compliance status at least once every 12 months.",
+      "required_artifacts": [
+        "12_8_4_Policy.pdf",
+        "12_8_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.8.5",
+      "title_en": "Risk to information assets associated with third-party service provider (TPSP) relationships is managed.",
+      "mandate_text": "Information is maintained about which PCI DSS requirements are managed by each TPSP, which are managed by the entity, and any that are shared between the TPSP and the entity.",
+      "required_artifacts": [
+        "12_8_5_Policy.pdf",
+        "12_8_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.9.1",
+      "title_en": "Third-party service providers (TPSPs) support their customers’ PCI DSS compliance.",
+      "mandate_text": "Additional requirement for service providers only: TPSPs provide written agreements to customers that include acknowledgements that TPSPs are responsible for the security of account data the TPSP possesses or otherwise stores, processes, or transmits on behalf of the customer, or to the extent that the TPSP could impact the security of the customer’s cardholder data and/or sensitive authentication data.",
+      "required_artifacts": [
+        "12_9_1_Policy.pdf",
+        "12_9_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.9.2",
+      "title_en": "Third-party service providers (TPSPs) support their customers’ PCI DSS compliance.",
+      "mandate_text": "Additional requirement for service providers only: TPSPs support their customers' requests for information to meet Requirements 12.8.4 and 12.8.5 by providing the following upon customer request:\n•\tPCI DSS compliance status information (Requirement 12.8.4).\n•\tInformation about which PCI DSS requirements are the responsibility of the TPSP and which are the responsibility of the customer, including any shared responsibilities (Requirement 12.8.5), for any service the TPSP provides that meets a PCI DSS requirement(s) on behalf of customers or that can impact security of customers’ cardholder data and/or sensitive authentication data.",
+      "required_artifacts": [
+        "12_9_2_Policy.pdf",
+        "12_9_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.10.1",
+      "title_en": "Suspected and confirmed security incidents that could impact the CDE are responded to immediately.",
+      "mandate_text": "An incident response plan exists and is ready to be activated in the event of a suspected or confirmed security incident. The plan includes, but is not limited to: \n•\tRoles, responsibilities, and communication and contact strategies in the event of a suspected or confirmed security incident, including notification of payment brands and acquirers, at a minimum.\n•\tIncident response procedures with specific containment and mitigation activities for different types of incidents.\n•\tBusiness recovery and continuity procedures.\n•\tData backup processes.\n•\tAnalysis of legal requirements for reporting compromises.\n•\tCoverage and responses of all critical system components.\n•\tReference or inclusion of incident response procedures from the payment brands.",
+      "required_artifacts": [
+        "12_10_1_Policy.pdf",
+        "12_10_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.10.2",
+      "title_en": "Suspected and confirmed security incidents that could impact the CDE are responded to immediately.",
+      "mandate_text": "At least once every 12 months, the security incident response plan is: \n•\tReviewed and the content is updated as needed.\n•\tTested, including all elements listed in Requirement 12.10.1.",
+      "required_artifacts": [
+        "12_10_2_Policy.pdf",
+        "12_10_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.10.3",
+      "title_en": "Suspected and confirmed security incidents that could impact the CDE are responded to immediately.",
+      "mandate_text": "Specific personnel are designated to be available on a 24/7 basis to respond to suspected or confirmed security incidents.",
+      "required_artifacts": [
+        "12_10_3_Policy.pdf",
+        "12_10_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.10.4",
+      "title_en": "Suspected and confirmed security incidents that could impact the CDE are responded to immediately.",
+      "mandate_text": "Personnel responsible for responding to suspected and confirmed security incidents are appropriately and periodically trained on their incident response responsibilities.",
+      "required_artifacts": [
+        "12_10_4_Policy.pdf",
+        "12_10_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.10.4.1",
+      "title_en": "Suspected and confirmed security incidents that could impact the CDE are responded to immediately.",
+      "mandate_text": "The frequency of periodic training for incident response personnel is defined in the entity’s targeted risk analysis, which is performed according to all elements specified in Requirement 12.3.1.",
+      "required_artifacts": [
+        "12_10_4_1_Policy.pdf",
+        "12_10_4_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.10.5",
+      "title_en": "Suspected and confirmed security incidents that could impact the CDE are responded to immediately.",
+      "mandate_text": "The security incident response plan includes monitoring and responding to alerts from security monitoring systems, including but not limited to: \n•\tIntrusion-detection and intrusion-prevention systems. \n•\tNetwork security controls.\n•\tChange-detection mechanisms for critical files. \n•\tThe change-and tamper-detection mechanism for payment pages.\n•\tDetection of unauthorized wireless access points.",
+      "required_artifacts": [
+        "12_10_5_Policy.pdf",
+        "12_10_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.10.6",
+      "title_en": "Suspected and confirmed security incidents that could impact the CDE are responded to immediately.",
+      "mandate_text": "The security incident response plan is modified and evolved according to lessons learned and to incorporate industry developments.",
+      "required_artifacts": [
+        "12_10_6_Policy.pdf",
+        "12_10_6_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "12.10.7",
+      "title_en": "Suspected and confirmed security incidents that could impact the CDE are responded to immediately.",
+      "mandate_text": "Incident response procedures are in place, to be initiated upon the detection of stored PAN anywhere it is not expected, and include:\n•\tDetermining what to do if PAN is discovered outside the CDE, including its retrieval, secure deletion, and/or migration into the currently defined CDE, as applicable.\n•\tIdentifying whether sensitive authentication data is stored with PAN. \n•\tDetermining where the account data came from and how it ended up where it was not expected.\n•\tRemediating data leaks or process gaps that resulted in the account data being where it was not expected.",
+      "required_artifacts": [
+        "12_10_7_Policy.pdf",
+        "12_10_7_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    }
+  ]
+}

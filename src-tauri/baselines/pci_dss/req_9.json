@@ -1,0 +1,277 @@
+{
+  "framework": "PCI DSS v4.0.1",
+  "requirement_id": 9,
+  "title": "Requirement 9: Restrict Physical Access to Cardholder Data",
+  "controls": [
+    {
+      "control_id": "9.1.1",
+      "title_en": "Processes and mechanisms for restricting physical access to cardholder data are defined and understood.",
+      "mandate_text": "All security policies and operational procedures that are identified in Requirement 9 are:\n•\tDocumented.\n•\tKept up to date.\n•\tIn use.\n•\tKnown to all affected parties.",
+      "required_artifacts": [
+        "9_1_1_Policy.pdf",
+        "9_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.1.2",
+      "title_en": "Processes and mechanisms for restricting physical access to cardholder data are defined and understood.",
+      "mandate_text": "Roles and responsibilities for performing activities in Requirement 9 are documented, assigned, and understood.",
+      "required_artifacts": [
+        "9_1_2_Policy.pdf",
+        "9_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.2.1",
+      "title_en": "Physical access controls manage entry into facilities and systems containing cardholder data.",
+      "mandate_text": "Appropriate facility entry controls are in place to restrict physical access to systems in the CDE.",
+      "required_artifacts": [
+        "9_2_1_Policy.pdf",
+        "9_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.2.1.1",
+      "title_en": "Physical access controls manage entry into facilities and systems containing cardholder data.",
+      "mandate_text": "Individual physical access to sensitive areas within the CDE is monitored with either video cameras or physical access control mechanisms (or both) as follows:\n•\tEntry and exit points to/from sensitive areas within the CDE are monitored. \n•\tMonitoring devices or mechanisms are protected from tampering or disabling.\n•\tCollected data is reviewed and correlated with other entries.\n•\tCollected data is stored for at least three months, unless otherwise restricted by law.",
+      "required_artifacts": [
+        "9_2_1_1_Policy.pdf",
+        "9_2_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.2.2",
+      "title_en": "Physical access controls manage entry into facilities and systems containing cardholder data.",
+      "mandate_text": "Physical and/or logical controls are implemented to restrict use of publicly accessible network jacks within the facility.",
+      "required_artifacts": [
+        "9_2_2_Policy.pdf",
+        "9_2_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.2.3",
+      "title_en": "Physical access controls manage entry into facilities and systems containing cardholder data.",
+      "mandate_text": "Physical access to wireless access points, gateways, networking/communications hardware, and telecommunication lines within the facility is restricted.",
+      "required_artifacts": [
+        "9_2_3_Policy.pdf",
+        "9_2_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.2.4",
+      "title_en": "Physical access controls manage entry into facilities and systems containing cardholder data.",
+      "mandate_text": "Access to consoles in sensitive areas is restricted via locking when not in use.",
+      "required_artifacts": [
+        "9_2_4_Policy.pdf",
+        "9_2_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.3.1",
+      "title_en": "Physical access for personnel and visitors is authorized and managed.",
+      "mandate_text": "Procedures are implemented for authorizing and managing physical access of personnel to the CDE, including:\n•\tIdentifying personnel.\n•\tManaging changes to an individual's physical access requirements.\n•\tRevoking or terminating personnel identification.\n•\tLimiting access to the identification process or system to authorized personnel.",
+      "required_artifacts": [
+        "9_3_1_Policy.pdf",
+        "9_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.3.1.1",
+      "title_en": "Physical access for personnel and visitors is authorized and managed.",
+      "mandate_text": "Physical access to sensitive areas within the CDE for personnel is controlled as follows:\n•\tAccess is authorized and based on individual job function.\n•\tAccess is revoked immediately upon termination.\n•\tAll physical access mechanisms, such as keys, access cards, etc., are returned or disabled upon termination.",
+      "required_artifacts": [
+        "9_3_1_1_Policy.pdf",
+        "9_3_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.3.2",
+      "title_en": "Physical access for personnel and visitors is authorized and managed.",
+      "mandate_text": "Procedures are implemented for authorizing and managing visitor access to the CDE, including:\n•\tVisitors are authorized before entering.\n•\tVisitors are escorted at all times.\n•\tVisitors are clearly identified and given a badge or other identification that expires.\n•\tVisitor badges or other identification visibly distinguishes visitors from personnel.",
+      "required_artifacts": [
+        "9_3_2_Policy.pdf",
+        "9_3_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.3.3",
+      "title_en": "Physical access for personnel and visitors is authorized and managed.",
+      "mandate_text": "Visitor badges or identification are surrendered or deactivated before visitors leave the facility or at the date of expiration.",
+      "required_artifacts": [
+        "9_3_3_Policy.pdf",
+        "9_3_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.3.4",
+      "title_en": "Physical access for personnel and visitors is authorized and managed.",
+      "mandate_text": "Visitor logs are used to maintain a physical record of visitor activity both within the facility and within sensitive areas, including: \n•\tThe visitor’s name and the organization represented.\n•\tThe date and time of the visit.\n•\tThe name of the personnel authorizing physical access. \n•\tRetaining the log for at least three months, unless otherwise restricted by law.",
+      "required_artifacts": [
+        "9_3_4_Policy.pdf",
+        "9_3_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.4.1",
+      "title_en": "Media with cardholder data is securely stored, accessed, distributed, and destroyed.",
+      "mandate_text": "All media with cardholder data is physically secured.",
+      "required_artifacts": [
+        "9_4_1_Policy.pdf",
+        "9_4_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.4.1.1",
+      "title_en": "Media with cardholder data is securely stored, accessed, distributed, and destroyed.",
+      "mandate_text": "Offline media backups with cardholder data are stored in a secure location.",
+      "required_artifacts": [
+        "9_4_1_1_Policy.pdf",
+        "9_4_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.4.1.2",
+      "title_en": "Media with cardholder data is securely stored, accessed, distributed, and destroyed.",
+      "mandate_text": "The security of the offline media backup location(s) with cardholder data is reviewed at least once every 12 months.",
+      "required_artifacts": [
+        "9_4_1_2_Policy.pdf",
+        "9_4_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.4.2",
+      "title_en": "Media with cardholder data is securely stored, accessed, distributed, and destroyed.",
+      "mandate_text": "All media with cardholder data is classified in accordance with the sensitivity of the data.",
+      "required_artifacts": [
+        "9_4_2_Policy.pdf",
+        "9_4_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.4.3",
+      "title_en": "Media with cardholder data is securely stored, accessed, distributed, and destroyed.",
+      "mandate_text": "Media with cardholder data sent outside the facility is secured as follows:\n•\tMedia sent outside the facility is logged.\n•\tMedia is sent by secured courier or other delivery method that can be accurately tracked.\n•\tOffsite tracking logs include details about media location.",
+      "required_artifacts": [
+        "9_4_3_Policy.pdf",
+        "9_4_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.4.4",
+      "title_en": "Media with cardholder data is securely stored, accessed, distributed, and destroyed.",
+      "mandate_text": "Management approves all media with cardholder data that is moved outside the facility (including when media is distributed to individuals).",
+      "required_artifacts": [
+        "9_4_4_Policy.pdf",
+        "9_4_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.4.5",
+      "title_en": "Media with cardholder data is securely stored, accessed, distributed, and destroyed.",
+      "mandate_text": "Inventory logs of all electronic media with cardholder data are maintained.",
+      "required_artifacts": [
+        "9_4_5_Policy.pdf",
+        "9_4_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.4.5.1",
+      "title_en": "Media with cardholder data is securely stored, accessed, distributed, and destroyed.",
+      "mandate_text": "Inventories of electronic media with cardholder data are conducted at least once every 12 months.",
+      "required_artifacts": [
+        "9_4_5_1_Policy.pdf",
+        "9_4_5_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.4.6",
+      "title_en": "Media with cardholder data is securely stored, accessed, distributed, and destroyed.",
+      "mandate_text": "Hard-copy materials with cardholder data are destroyed when no longer needed for business or legal reasons, as follows:\n•\tMaterials are cross-cut shredded, incinerated, or pulped so that cardholder data cannot be reconstructed. \n•\tMaterials are stored in secure storage containers prior to destruction.",
+      "required_artifacts": [
+        "9_4_6_Policy.pdf",
+        "9_4_6_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.4.7",
+      "title_en": "Media with cardholder data is securely stored, accessed, distributed, and destroyed.",
+      "mandate_text": "Electronic media with cardholder data is destroyed when no longer needed for business or legal reasons via one of the following: \n•\tThe electronic media is destroyed.\n•\tThe cardholder data is rendered unrecoverable so that it cannot be reconstructed.",
+      "required_artifacts": [
+        "9_4_7_Policy.pdf",
+        "9_4_7_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.5.1",
+      "title_en": "Point-of-interaction (POI) devices are protected from tampering and unauthorized substitution.",
+      "mandate_text": "POI devices that capture payment card data via direct physical interaction with the payment card form factor are protected from tampering and unauthorized substitution, including the following:\n•\tMaintaining a list of POI devices. \n•\tPeriodically inspecting POI devices to look for tampering or unauthorized substitution. \n•\tTraining personnel to be aware of suspicious behavior and to report tampering or unauthorized substitution of devices.",
+      "required_artifacts": [
+        "9_5_1_Policy.pdf",
+        "9_5_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.5.1.1",
+      "title_en": "Point-of-interaction (POI) devices are protected from tampering and unauthorized substitution.",
+      "mandate_text": "An up-to-date list of POI devices is maintained, including:\n•\tMake and model of the device. \n•\tLocation of device. \n•\tDevice serial number or other methods of unique identification.",
+      "required_artifacts": [
+        "9_5_1_1_Policy.pdf",
+        "9_5_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.5.1.2",
+      "title_en": "Point-of-interaction (POI) devices are protected from tampering and unauthorized substitution.",
+      "mandate_text": "POI device surfaces are periodically inspected to detect tampering and unauthorized substitution.",
+      "required_artifacts": [
+        "9_5_1_2_Policy.pdf",
+        "9_5_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.5.1.2.1",
+      "title_en": "Point-of-interaction (POI) devices are protected from tampering and unauthorized substitution.",
+      "mandate_text": "The frequency of periodic POI device inspections and the type of inspections performed is defined in the entity’s targeted risk analysis, which is performed according to all elements specified in Requirement 12.3.1.",
+      "required_artifacts": [
+        "9_5_1_2_1_Policy.pdf",
+        "9_5_1_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "9.5.1.3",
+      "title_en": "Point-of-interaction (POI) devices are protected from tampering and unauthorized substitution.",
+      "mandate_text": "Training is provided for personnel in POI environments to be aware of attempted tampering or replacement of POI devices, and includes:\n•\tVerifying the identity of any third-party persons claiming to be repair or maintenance personnel, before granting them access to modify or troubleshoot devices.\n•\tProcedures to ensure devices are not installed, replaced, or returned without verification. \n•\tBeing aware of suspicious behavior around devices.\n•\tReporting suspicious behavior and indications of device tampering or substitution to appropriate personnel.",
+      "required_artifacts": [
+        "9_5_1_3_Policy.pdf",
+        "9_5_1_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    }
+  ]
+}

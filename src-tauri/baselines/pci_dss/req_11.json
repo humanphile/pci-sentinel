@@ -1,0 +1,217 @@
+{
+  "framework": "PCI DSS v4.0.1",
+  "requirement_id": 11,
+  "title": "Requirement 11: Test Security of Systems and Networks Regularly",
+  "controls": [
+    {
+      "control_id": "11.1.1",
+      "title_en": "Processes and mechanisms for regularly testing security of systems and networks are defined and understood.",
+      "mandate_text": "All security policies and operational procedures that are identified in Requirement 11 are: \n•\tDocumented.\n•\tKept up to date. \n•\tIn use.\n•\tKnown to all affected parties.",
+      "required_artifacts": [
+        "11_1_1_Policy.pdf",
+        "11_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.1.2",
+      "title_en": "Processes and mechanisms for regularly testing security of systems and networks are defined and understood.",
+      "mandate_text": "Roles and responsibilities for performing activities in Requirement 11 are documented, assigned, and understood.",
+      "required_artifacts": [
+        "11_1_2_Policy.pdf",
+        "11_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.2.1",
+      "title_en": "Wireless access points are identified and monitored, and unauthorized wireless access points are addressed.",
+      "mandate_text": "Authorized and unauthorized wireless access points are managed as follows:\n•\tThe presence of wireless (Wi-Fi) access points is tested for, \n•\tAll authorized and unauthorized wireless access points are detected and identified, \n•\tTesting, detection, and identification occurs at least once every three months. \n•\tIf automated monitoring is used, personnel are notified via generated alerts.",
+      "required_artifacts": [
+        "11_2_1_Policy.pdf",
+        "11_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.2.2",
+      "title_en": "Wireless access points are identified and monitored, and unauthorized wireless access points are addressed.",
+      "mandate_text": "An inventory of authorized wireless access points is maintained, including a documented business justification.",
+      "required_artifacts": [
+        "11_2_2_Policy.pdf",
+        "11_2_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.3.1",
+      "title_en": "External and internal vulnerabilities are regularly identified, prioritized, and addressed.",
+      "mandate_text": "Internal vulnerability scans are performed as follows: \n•\tAt least once every three months.\n•\tVulnerabilities that are either high-risk or critical (according to the entity's vulnerability risk rankings defined at Requirement 6.3.1) are resolved.\n•\tRescans are performed that confirm all high-risk and critical vulnerabilities (as noted above) have been resolved.\n•\tScan tool is kept up to date with latest vulnerability information.\n•\tScans are performed by qualified personnel and organizational independence of the tester exists.",
+      "required_artifacts": [
+        "11_3_1_Policy.pdf",
+        "11_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.3.1.1",
+      "title_en": "External and internal vulnerabilities are regularly identified, prioritized, and addressed.",
+      "mandate_text": "All other applicable vulnerabilities (those not ranked as high-risk vulnerabilities or critical vulnerabilities according to the entity’s vulnerability risk rankings defined at Requirement 6.3.1) are managed as follows: \n•\tAddressed based on the risk defined in the entity’s targeted risk analysis, which is performed according to all elements specified in Requirement 12.3.1.\n•\tRescans are conducted as needed.",
+      "required_artifacts": [
+        "11_3_1_1_Policy.pdf",
+        "11_3_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.3.1.2",
+      "title_en": "External and internal vulnerabilities are regularly identified, prioritized, and addressed.",
+      "mandate_text": "Internal vulnerability scans are performed via authenticated scanning as follows:\n•\tSystems that are unable to accept credentials for authenticated scanning are documented.\n•\tSufficient privileges are used for those systems that accept credentials for scanning. \n•\tIf accounts used for authenticated scanning can be used for interactive login, they are managed in accordance with Requirement 8.2.2.",
+      "required_artifacts": [
+        "11_3_1_2_Policy.pdf",
+        "11_3_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.3.1.3",
+      "title_en": "External and internal vulnerabilities are regularly identified, prioritized, and addressed.",
+      "mandate_text": "Internal vulnerability scans are performed after any significant change as follows:\n•\tVulnerabilities that are either high-risk or critical (according to the entity's vulnerability risk rankings defined at Requirement 6.3.1) are resolved.\n•\tRescans are conducted as needed.\n•\tScans are performed by qualified personnel and organizational independence of the tester exists (not required to be a QSA or ASV).",
+      "required_artifacts": [
+        "11_3_1_3_Policy.pdf",
+        "11_3_1_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.3.2",
+      "title_en": "External and internal vulnerabilities are regularly identified, prioritized, and addressed.",
+      "mandate_text": "External vulnerability scans are performed as follows:\n•\tAt least once every three months.\n•\tBy PCI SSC Approved Scanning Vendor (ASV). \n•\tVulnerabilities are resolved and ASV Program Guide requirements for a passing scan are met.\n•\tRescans are performed as needed to confirm that vulnerabilities are resolved per the ASV Program Guide requirements for a passing scan.",
+      "required_artifacts": [
+        "11_3_2_Policy.pdf",
+        "11_3_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.3.2.1",
+      "title_en": "External and internal vulnerabilities are regularly identified, prioritized, and addressed.",
+      "mandate_text": "External vulnerability scans are performed after any significant change as follows:\n•\tVulnerabilities that are scored 4.0 or higher by the CVSS are resolved.\n•\tRescans are conducted as needed.\n•\tScans are performed by qualified personnel and organizational independence of the tester exists (not required to be a QSA or ASV).",
+      "required_artifacts": [
+        "11_3_2_1_Policy.pdf",
+        "11_3_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.4.1",
+      "title_en": "External and internal penetration testing is regularly performed, and exploitable vulnerabilities and security weaknesses are corrected.",
+      "mandate_text": "A penetration testing methodology is defined, documented, and implemented by the entity and includes: \n•\tIndustry-accepted penetration testing approaches.\n•\tCoverage for the entire CDE perimeter and critical systems. \n•\tTesting from both inside and outside the network. \n•\tTesting to validate any segmentation and scope-reduction controls. \n•\tApplication-layer penetration testing to identify, at a minimum, the vulnerabilities listed in Requirement 6.2.4. \n•\tNetwork-layer penetration tests that encompass all components that support network functions as well as operating systems. \n•\tReview and consideration of threats and vulnerabilities experienced in the last 12 months. \n•\tDocumented approach to assessing and addressing the risk posed by exploitable vulnerabilities and security weaknesses found during penetration testing. \n•\tRetention of penetration testing results and remediation activities results for at least 12 months.",
+      "required_artifacts": [
+        "11_4_1_Policy.pdf",
+        "11_4_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.4.2",
+      "title_en": "External and internal penetration testing is regularly performed, and exploitable vulnerabilities and security weaknesses are corrected.",
+      "mandate_text": "Internal penetration testing is performed:\n•\tPer the entity's defined methodology \n•\tAt least once every 12 months \n•\tAfter any significant infrastructure or application upgrade or change\n•\tBy a qualified internal resource or qualified external third-party\n•\tOrganizational independence of the tester exists (not required to be a QSA or ASV)",
+      "required_artifacts": [
+        "11_4_2_Policy.pdf",
+        "11_4_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.4.3",
+      "title_en": "External and internal penetration testing is regularly performed, and exploitable vulnerabilities and security weaknesses are corrected.",
+      "mandate_text": "External penetration testing is performed: \n•\tPer the entity's defined methodology \n•\tAt least once every 12 months \n•\tAfter any significant infrastructure or application upgrade or change\n•\tBy a qualified internal resource or qualified external third party\n•\tOrganizational independence of the tester exists (not required to be a QSA or ASV)",
+      "required_artifacts": [
+        "11_4_3_Policy.pdf",
+        "11_4_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.4.4",
+      "title_en": "External and internal penetration testing is regularly performed, and exploitable vulnerabilities and security weaknesses are corrected.",
+      "mandate_text": "Exploitable vulnerabilities and security weaknesses found during penetration testing are corrected as follows:\n•\tIn accordance with the entity's assessment of the risk posed by the security issue as defined in Requirement 6.3.1.\n•\tPenetration testing is repeated to verify the corrections.",
+      "required_artifacts": [
+        "11_4_4_Policy.pdf",
+        "11_4_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.4.5",
+      "title_en": "External and internal penetration testing is regularly performed, and exploitable vulnerabilities and security weaknesses are corrected.",
+      "mandate_text": "If segmentation is used to isolate the CDE from other networks, penetration tests are performed on segmentation controls as follows:\n•\tAt least once every 12 months and after any changes to segmentation controls/methods \n•\tCovering all segmentation controls/methods in use\n•\tAccording to the entity's defined penetration testing methodology\n•\tConfirming that the segmentation controls/methods are operational and effective, and isolate the CDE from all out-of-scope systems\n•\tConfirming effectiveness of any use of isolation to separate systems with differing security levels (see Requirement 2.2.3)\n•\tPerformed by a qualified internal resource or qualified external third party\n•\tOrganizational independence of the tester exists (not required to be a QSA or ASV)",
+      "required_artifacts": [
+        "11_4_5_Policy.pdf",
+        "11_4_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.4.6",
+      "title_en": "External and internal penetration testing is regularly performed, and exploitable vulnerabilities and security weaknesses are corrected.",
+      "mandate_text": "Additional requirement for service providers only: If segmentation is used to isolate the CDE from other networks, penetration tests are performed on segmentation controls as follows: \n•\tAt least once every six months and after any changes to segmentation controls/methods. \n•\tCovering all segmentation controls/methods in use.\n•\tAccording to the entity's defined penetration testing methodology.\n•\tConfirming that the segmentation controls/methods are operational and effective, and isolate the CDE from all out-of-scope systems.\n•\tConfirming effectiveness of any use of isolation to separate systems with differing security levels (see Requirement 2.2.3).\n•\tPerformed by a qualified internal resource or qualified external third party.\n•\tOrganizational independence of the tester exists (not required to be a QSA or ASV).",
+      "required_artifacts": [
+        "11_4_6_Policy.pdf",
+        "11_4_6_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.4.7",
+      "title_en": "External and internal penetration testing is regularly performed, and exploitable vulnerabilities and security weaknesses are corrected.",
+      "mandate_text": "Additional requirement for multi-tenant service providers only: Multi-tenant service providers support their customers for external penetration testing per Requirement 11.4.3 and 11.4.4.",
+      "required_artifacts": [
+        "11_4_7_Policy.pdf",
+        "11_4_7_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.5.1",
+      "title_en": "Network intrusions and unexpected file changes are detected and responded to.",
+      "mandate_text": "Intrusion-detection and/or intrusion-prevention techniques are used to detect and/or prevent intrusions into the network as follows: \n•\tAll traffic is monitored at the perimeter of the CDE. \n•\tAll traffic is monitored at critical points in the CDE. \n•\tPersonnel are alerted to suspected compromises. \n•\tAll intrusion-detection and prevention engines, baselines, and signatures are kept up to date.",
+      "required_artifacts": [
+        "11_5_1_Policy.pdf",
+        "11_5_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.5.1.1",
+      "title_en": "Network intrusions and unexpected file changes are detected and responded to.",
+      "mandate_text": "Additional requirement for service providers only: Intrusion-detection and/or intrusion-prevention techniques detect, alert on/prevent, and address covert malware communication channels.",
+      "required_artifacts": [
+        "11_5_1_1_Policy.pdf",
+        "11_5_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.5.2",
+      "title_en": "Network intrusions and unexpected file changes are detected and responded to.",
+      "mandate_text": "A change-detection mechanism (for example, file integrity monitoring tools) is deployed as follows:\n•\tTo alert personnel to unauthorized modification (including changes, additions, and deletions) of critical files.\n•\tTo perform critical file comparisons at least once weekly.",
+      "required_artifacts": [
+        "11_5_2_Policy.pdf",
+        "11_5_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "11.6.1",
+      "title_en": "Unauthorized changes on payment pages are detected and responded to.",
+      "mandate_text": "A change- and tamper-detection mechanism is deployed as follows:\n•\tTo alert personnel to unauthorized modification (including indicators of compromise, changes, additions, and deletions) to the security-impacting HTTP headers and the script contents of payment pages as received by the consumer browser.\n•\tThe mechanism is configured to evaluate the received HTTP headers and payment pages. \n•\tThe mechanism functions are performed as follows:\n–\tAt least once weekly\nOR\n–\tPeriodically (at the frequency defined in the entity's targeted risk analysis, which is performed according to all elements specified in Requirement 12.3.1).",
+      "required_artifacts": [
+        "11_6_1_Policy.pdf",
+        "11_6_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    }
+  ]
+}

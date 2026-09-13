@@ -1,0 +1,138 @@
+{
+  "framework": "PCI DSS v4.0",
+  "version": "4.0",
+  "standard_body": "PCI Security Standards Council",
+  "requirements": [
+    {
+      "requirement_id": 1,
+      "title": "Requirement 1: Install and Maintain Network Security Controls",
+      "controls": [
+        {
+          "control_id": "1.1.1",
+          "title_en": "NSC Security Policies & Operational Procedures",
+          "mandate_text": "All security policies and operational procedures that are identified in Requirement 1 are documented, kept up to date, in use, and known to all affected parties.",
+          "required_artifacts": ["Network_Security_Policy.pdf", "Operational_Procedures_SOP.pdf", "Training_Acknowledgment_Logs.csv"]
+        },
+        {
+          "control_id": "1.1.2",
+          "title_en": "Roles and Responsibilities for Managing NSCs",
+          "mandate_text": "Roles and responsibilities for performing activities in Requirement 1 are documented, assigned, and understood by responsible personnel.",
+          "required_artifacts": ["RACI_Matrix_Network_Security.xlsx", "Network_Admin_Job_Descriptions.pdf"]
+        },
+        {
+          "control_id": "1.2.1",
+          "title_en": "Network Security Control Configurations",
+          "mandate_text": "Configurations of network security controls (NSCs) are formalized, documented, and approved via established change management procedures.",
+          "required_artifacts": ["Change_Request_Tickets.pdf", "Firewall_Baseline_Standard.pdf"]
+        },
+        {
+          "control_id": "1.2.2",
+          "title_en": "Current Network Architecture Diagrams",
+          "mandate_text": "Current network diagrams exist that document all connections between the cardholder data environment (CDE) and other networks, including wireless networks.",
+          "required_artifacts": ["Network_Architecture_Diagram.pdf", "Wireless_Topology_Map.vsdx"]
+        },
+        {
+          "control_id": "1.2.3",
+          "title_en": "Data Flow Diagrams (Cardholder Data Flows)",
+          "mandate_text": "Current data flow diagrams exist that illustrate all cardholder data flows across systems and networks, kept up to date and verified periodically.",
+          "required_artifacts": ["Cardholder_Data_Flow_Diagram.pdf", "Data_Inventory_Matrix.csv"]
+        },
+        {
+          "control_id": "1.2.4",
+          "title_en": "Management of Vendor-Managed Systems",
+          "mandate_text": "Vendor-owned or vendor-managed systems connecting to the network are secured according to organizational NSC requirements and approved.",
+          "required_artifacts": ["Third_Party_Service_Agreements.pdf", "Vendor_Connection_Authorization.pdf"]
+        },
+        {
+          "control_id": "1.2.5",
+          "title_en": "Services, Protocols, and Ports Approved & Justified",
+          "mandate_text": "All services, protocols, and ports allowed through NSCs are documented, justified with a defined business need, and approved.",
+          "required_artifacts": ["Port_Justification_Matrix.xlsx", "Nmap_Perimeter_Scan.log"]
+        },
+        {
+          "control_id": "1.2.6",
+          "title_en": "Security Features for Insecure Services",
+          "mandate_text": "Security features are defined and implemented for all insecure services, protocols, and ports in use (e.g., encapsulating cleartext traffic in SSH, TLS, or IPSec).",
+          "required_artifacts": ["Insecure_Services_Mitigation_Plan.pdf", "VPN_Tunnel_Config.json"]
+        },
+        {
+          "control_id": "1.2.7",
+          "title_en": "Bi-Annual NSC Rule Set Review",
+          "mandate_text": "Configurations and rule sets of network security controls are reviewed at least once every six months to verify business necessity and validate that unauthorized rules are removed.",
+          "required_artifacts": ["Semi_Annual_Firewall_Review_Minutes.pdf", "Rule_Decommissioning_Log.csv"]
+        },
+        {
+          "control_id": "1.2.8",
+          "title_en": "Securing NSC Configuration Files",
+          "mandate_text": "Network security control configuration files are protected from unauthorized access, alteration, and maintained in secure, versioned storage.",
+          "required_artifacts": ["Git_Config_Audit_Log.json", "Backup_Access_Control_ACL.txt"]
+        },
+        {
+          "control_id": "1.3.1",
+          "title_en": "Restrict Inbound Traffic to the CDE",
+          "mandate_text": "Inbound traffic to the cardholder data environment is restricted to only traffic that is necessary; all other inbound traffic is specifically denied.",
+          "required_artifacts": ["Inbound_Firewall_Rules_Export.csv", "Default_Deny_Verification.log"]
+        },
+        {
+          "control_id": "1.3.2",
+          "title_en": "Restrict Outbound Traffic from the CDE",
+          "mandate_text": "Outbound traffic from the cardholder data environment is restricted to only traffic that is necessary; all other outbound traffic is specifically denied.",
+          "required_artifacts": ["Egress_Filter_Rules.csv", "Outbound_Proxy_Access_Log.txt"]
+        },
+        {
+          "control_id": "1.3.3",
+          "title_en": "Isolation Between Wireless Networks and the CDE",
+          "mandate_text": "Network security controls are implemented between all wireless networks and the CDE, denying all wireless traffic by default unless authorized and encrypted.",
+          "required_artifacts": ["Wireless_Controller_ACL.txt", "WPA3_Enterprise_Certificates.pdf"]
+        },
+        {
+          "control_id": "1.4.1",
+          "title_en": "NSCs Between Untrusted and Trusted Networks",
+          "mandate_text": "Network security controls are implemented between all untrusted networks and trusted system components within the corporate network and CDE.",
+          "required_artifacts": ["Perimeter_Firewall_Topology.pdf", "Boundary_Interface_Routing.txt"]
+        },
+        {
+          "control_id": "1.4.2",
+          "title_en": "Restricting Inbound Traffic from Untrusted Networks",
+          "mandate_text": "Inbound traffic from untrusted networks to trusted systems is restricted to communications with components authorized to provide publicly accessible services.",
+          "required_artifacts": ["DMZ_Ingress_Filter.json", "Reverse_Proxy_NAT_Rules.txt"]
+        },
+        {
+          "control_id": "1.4.3",
+          "title_en": "Anti-Spoofing Filters Implemented",
+          "mandate_text": "Anti-spoofing measures are implemented to detect and block forged IP source addresses from entering the trusted network (e.g., blocking RFC 1918 traffic from the public Internet).",
+          "required_artifacts": ["uRPF_Border_Router_Config.txt", "ACL_Bogon_Filter.txt"]
+        },
+        {
+          "control_id": "1.4.4",
+          "title_en": "Prohibit Direct Internet Routing to Private Addresses",
+          "mandate_text": "System components that store cardholder data or sensitive authentication data are not directly accessible from untrusted networks using public IP addresses (NAT/DMZ required).",
+          "required_artifacts": ["NAT_Table_Dump.csv", "Public_IP_Assignment_Audit.txt"]
+        },
+        {
+          "control_id": "1.4.5",
+          "title_en": "Prohibit Direct Connection to Internal Databases",
+          "mandate_text": "Direct public inbound access to databases or internal storage holding cardholder data from the Internet is prohibited. Intermediate web/app tiers must mediate access.",
+          "required_artifacts": ["Database_Subnet_NSG.json", "DB_Connection_Listener_Audit.log"]
+        },
+        {
+          "control_id": "1.5.1",
+          "title_en": "Security Controls on Portable & Remote Devices",
+          "mandate_text": "Security controls are implemented on all computing devices that connect to both untrusted networks and the CDE to protect against unauthorized compromise.",
+          "required_artifacts": ["EDR_Agent_Status_Report.csv", "Host_Based_Firewall_GPO.xml"]
+        }
+      ]
+    },
+    { "requirement_id": 2, "title": "Requirement 2: Apply Secure Configurations to All System Components", "controls": [] },
+    { "requirement_id": 3, "title": "Requirement 3: Protect Stored Account Data", "controls": [] },
+    { "requirement_id": 4, "title": "Requirement 4: Protect Cardholder Data with Strong Cryptography During Transmission Over Open, Public Networks", "controls": [] },
+    { "requirement_id": 5, "title": "Requirement 5: Protect All Systems and Networks from Malicious Software", "controls": [] },
+    { "requirement_id": 6, "title": "Requirement 6: Develop and Maintain Secure Systems and Software", "controls": [] },
+    { "requirement_id": 7, "title": "Requirement 7: Restrict Access to System Components and Cardholder Data by Business Need to Know", "controls": [] },
+    { "requirement_id": 8, "title": "Requirement 8: Identify Users and Authenticate Access to System Components", "controls": [] },
+    { "requirement_id": 9, "title": "Requirement 9: Restrict Physical Access to Cardholder Data", "controls": [] },
+    { "requirement_id": 10, "title": "Requirement 10: Log and Monitor All Access to System Components and Cardholder Data", "controls": [] },
+    { "requirement_id": 11, "title": "Requirement 11: Test Security of Systems and Networks Regularly", "controls": [] },
+    { "requirement_id": 12, "title": "Requirement 12: Support Information Security with Organizational Policies and Programs", "controls": [] }
+  ]
+}

@@ -1,0 +1,61 @@
+import pandas as pd
+import json
+import os
+
+excel_path = "Compliance Assessments PCI_2025.xlsx"
+output_dir = "src-tauri/baselines/pci_dss"
+os.makedirs(output_dir, exist_ok=True)
+
+# Read the Excel file using pandas
+xls = pd.ExcelFile(excel_path)
+print(f"Available sheets: {xls.sheet_names}")
+
+# Read the PCI_4_0_1 sheet
+df = pd.read_excel(xls, sheet_name="PCI_4_0_1")
+
+# Clean column headers from row 0
+df.columns = [str(c).strip() for c in df.iloc[0]]
+df = df.iloc[1:].reset_index(drop=True)
+
+# Standardize column names (keeping only columns A through F)
+df.columns = [c.strip() for c in df.columns]
+
+req_groups = df.groupby('Requirement Number')
+
+for req_num, group in req_groups:
+    try:
+        req_num_int = int(req_num)
+    except ValueError:
+        continue
+        
+    req_name = str(group['Requirement Name'].iloc[0]).strip()
+    
+    controls = []
+    for idx, row in group.iterrows():
+        c_id = str(row['Control Number']).strip()
+        safe_id = c_id.replace(".", "_")
+        sub_name = str(row['Sub Requirement Name']).strip()
+        mandate = str(row['Control Description']).strip()
+        
+        # Strictly columns A through F mapped; Column G (Test of Implementation) is excluded entirely.
+        controls.append({
+            "control_id": c_id,
+            "title_en": sub_name,
+            "mandate_text": mandate,
+            "required_artifacts": [f"{safe_id}_Policy.pdf", f"{safe_id}_Evidence.xlsx"],
+            "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+        })
+        
+    req_json = {
+        "framework": "PCI DSS v4.0.1",
+        "requirement_id": req_num_int,
+        "title": f"Requirement {req_num_int}: {req_name}",
+        "controls": controls
+    }
+    
+    filepath = os.path.join(output_dir, f"req_{req_num_int}.json")
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(req_json, f, indent=2, ensure_ascii=False)
+    print(f"Successfully generated req_{req_num_int}.json with {len(controls)} controls (Columns A-F).")
+
+print("All 12 requirement baseline files successfully created!")

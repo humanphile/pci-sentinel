@@ -1,0 +1,137 @@
+{
+  "framework": "PCI DSS v4.0.1",
+  "requirement_id": 5,
+  "title": "Requirement 5: Protect All Systems and Networks from Malicious Software",
+  "controls": [
+    {
+      "control_id": "5.1.1",
+      "title_en": "Processes and mechanisms for protecting all systems and networks from malicious software are defined and understood.",
+      "mandate_text": "All security policies and operational procedures that are identified in Requirement 5 are:\n•\tDocumented.\n•\tKept up to date.\n•\tIn use.\n•\tKnown to all affected parties.",
+      "required_artifacts": [
+        "5_1_1_Policy.pdf",
+        "5_1_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "5.1.2",
+      "title_en": "Processes and mechanisms for protecting all systems and networks from malicious software are defined and understood.",
+      "mandate_text": "Roles and responsibilities for performing activities in Requirement 5 are documented, assigned, and understood.",
+      "required_artifacts": [
+        "5_1_2_Policy.pdf",
+        "5_1_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "5.2.1",
+      "title_en": "Malicious software (malware) is prevented or detected and addressed.",
+      "mandate_text": "An anti-malware solution(s) is deployed on all system components, except for those system components identified in periodic evaluations per Requirement 5.2.3 that concludes the system components are not at risk from malware.",
+      "required_artifacts": [
+        "5_2_1_Policy.pdf",
+        "5_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "5.2.2",
+      "title_en": "Malicious software (malware) is prevented or detected and addressed.",
+      "mandate_text": "The deployed anti-malware solution(s):\n•\tDetects all known types of malware.\n•\tRemoves, blocks, or contains all known types of malware.",
+      "required_artifacts": [
+        "5_2_2_Policy.pdf",
+        "5_2_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "5.2.3",
+      "title_en": "Malicious software (malware) is prevented or detected and addressed.",
+      "mandate_text": "Any system components that are not at risk for malware are evaluated periodically to include the following: \n•\tA documented list of all system components not at risk for malware.\n•\tIdentification and evaluation of evolving malware threats for those system components.\n•\tConfirmation whether such system components continue to not require anti-malware protection.",
+      "required_artifacts": [
+        "5_2_3_Policy.pdf",
+        "5_2_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "5.2.3.1",
+      "title_en": "Malicious software (malware) is prevented or detected and addressed.",
+      "mandate_text": "The frequency of periodic evaluations of system components identified as not at risk for malware is defined in the entity’s targeted risk analysis, which is performed according to all elements specified in Requirement 12.3.1.",
+      "required_artifacts": [
+        "5_2_3_1_Policy.pdf",
+        "5_2_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "5.3.1",
+      "title_en": "Anti-malware mechanisms and processes are active, maintained, and monitored.",
+      "mandate_text": "The anti-malware solution(s) is kept current via automatic updates.",
+      "required_artifacts": [
+        "5_3_1_Policy.pdf",
+        "5_3_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "5.3.2",
+      "title_en": "Anti-malware mechanisms and processes are active, maintained, and monitored.",
+      "mandate_text": "The anti-malware solution(s):\n•\tPerforms periodic scans and active or real-time scans.\nOR\n•\tPerforms continuous behavioral analysis of systems or processes. ",
+      "required_artifacts": [
+        "5_3_2_Policy.pdf",
+        "5_3_2_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "5.3.2.1",
+      "title_en": "Anti-malware mechanisms and processes are active, maintained, and monitored.",
+      "mandate_text": "If periodic malware scans are performed to meet Requirement 5.3.2, the frequency of scans is defined in the entity’s targeted risk analysis, which is performed according to all elements specified in Requirement 12.3.1.",
+      "required_artifacts": [
+        "5_3_2_1_Policy.pdf",
+        "5_3_2_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "5.3.3",
+      "title_en": "Anti-malware mechanisms and processes are active, maintained, and monitored.",
+      "mandate_text": "For removable electronic media, the anti-malware solution(s): \n•\tPerforms automatic scans of when the media is inserted, connected, or logically mounted,\nOR\n•\tPerforms continuous behavioral analysis of systems or processes when the media is inserted, connected, or logically mounted.",
+      "required_artifacts": [
+        "5_3_3_Policy.pdf",
+        "5_3_3_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "5.3.4",
+      "title_en": "Anti-malware mechanisms and processes are active, maintained, and monitored.",
+      "mandate_text": "Audit logs for the anti-malware solution(s) are enabled and retained in accordance with Requirement 10.5.1.",
+      "required_artifacts": [
+        "5_3_4_Policy.pdf",
+        "5_3_4_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "5.3.5",
+      "title_en": "Anti-malware mechanisms and processes are active, maintained, and monitored.",
+      "mandate_text": "Anti-malware mechanisms cannot be disabled or altered by users, unless specifically documented, and authorized by management on a case-by-case basis for a limited time period.",
+      "required_artifacts": [
+        "5_3_5_Policy.pdf",
+        "5_3_5_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    },
+    {
+      "control_id": "5.4.1",
+      "title_en": "Anti-phishing mechanisms protect users against phishing attacks.",
+      "mandate_text": "Processes and automated mechanisms are in place to detect and protect personnel against phishing attacks.",
+      "required_artifacts": [
+        "5_4_1_Policy.pdf",
+        "5_4_1_Evidence.xlsx"
+      ],
+      "sample_evidence": "The assessor verified that the security controls and operational procedures are implemented and tested in accordance with PCI DSS standards."
+    }
+  ]
+}
