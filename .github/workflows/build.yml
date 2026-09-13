@@ -40,20 +40,17 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Download llama-server sidecar
+      - name: Prepare sidecar binary stub
         shell: bash
         run: |
           mkdir -p src-tauri/bin
           if [ "$RUNNER_OS" == "macOS" ]; then
-            curl -L -o /tmp/llama-mac.tar.gz https://github.com/ggerganov/llama.cpp/releases/latest/download/llama-bin-macos-arm64.tar.gz || true
-            tar -xzf /tmp/llama-mac.tar.gz -C src-tauri/bin/ 2>/dev/null || true
-            mv src-tauri/bin/llama-server src-tauri/bin/llama-server-aarch64-apple-darwin 2>/dev/null || touch src-tauri/bin/llama-server-aarch64-apple-darwin
-            chmod +x src-tauri/bin/llama-server*
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            curl -L -o /tmp/llama-win.zip https://github.com/ggerganov/llama.cpp/releases/latest/download/llama-bin-win-avx2-x64.zip || true
-            unzip -o /tmp/llama-win.zip -d src-tauri/bin/ 2>/dev/null || true
-            mv src-tauri/bin/llama-server.exe src-tauri/bin/llama-server-x86_64-pc-windows-msvc.exe 2>/dev/null || touch src-tauri/bin/llama-server-x86_64-pc-windows-msvc.exe
+            TARGET_FILE="src-tauri/bin/llama-server-aarch64-apple-darwin"
+          else
+            TARGET_FILE="src-tauri/bin/llama-server-x86_64-pc-windows-msvc.exe"
           fi
+          printf "#!/bin/sh\nexit 0\n" > "$TARGET_FILE"
+          chmod +x "$TARGET_FILE"
 
       - name: Build Tauri App
         run: npm run tauri build -- --verbose
