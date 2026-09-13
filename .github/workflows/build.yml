@@ -43,13 +43,13 @@ jobs:
       - name: Prepare sidecar binary stub
         shell: bash
         run: |
-          mkdir -p src-tauri/bin
           if [ "$RUNNER_OS" == "macOS" ]; then
             TARGET_FILE="src-tauri/bin/llama-server-aarch64-apple-darwin"
           else
             TARGET_FILE="src-tauri/bin/llama-server-x86_64-pc-windows-msvc.exe"
           fi
-          printf "#!/bin/sh\nexit 0\n" > "$TARGET_FILE"
+          mkdir -p "$(dirname "$TARGET_FILE")"
+          printf '#!/bin/sh\nexit 0\n' > "$TARGET_FILE"
           chmod +x "$TARGET_FILE"
 
       - name: Build Tauri App
