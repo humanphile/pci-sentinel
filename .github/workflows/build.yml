@@ -35,7 +35,7 @@ jobs:
       - name: Build Frontend
         run: npm run build
 
-      - name: Setup Rust (MSVC / Apple)
+      - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
@@ -43,16 +43,17 @@ jobs:
       - name: Prepare sidecar binary stub
         shell: bash
         run: |
+          set -e
           mkdir -p src-tauri/bin
           if [ "$RUNNER_OS" == "macOS" ]; then
             TARGET_FILE="src-tauri/bin/llama-server-aarch64-apple-darwin"
           else
             TARGET_FILE="src-tauri/bin/llama-server-x86_64-pc-windows-msvc.exe"
           fi
-          touch "$TARGET_FILE"
+          mkdir -p "$(dirname "$TARGET_FILE")"
+          printf '#!/bin/sh\nexit 0\n' > "$TARGET_FILE"
           chmod +x "$TARGET_FILE"
-          echo '#!/bin/sh' > "$TARGET_FILE"
-          echo 'exit 0' >> "$TARGET_FILE"
+          ls -la src-tauri/bin/
 
       - name: Build Tauri App
         run: npm run tauri build -- --verbose
