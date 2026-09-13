@@ -33,7 +33,7 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Setup Rust (MSVC / Apple)
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Build Tauri App & Create Release/Artifacts
         uses: tauri-apps/tauri-action@v0
