@@ -25,12 +25,9 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["dmg", "app"],
+    "targets": ["all"],
     "resources": [
       "baselines/pci_dss/*"
-    ],
-    "externalBin": [
-      "bin/llama-server"
     ],
     "macOS": {
       "frameworks": [],
