@@ -40,6 +40,22 @@ jobs:
         with:
           toolchain: stable
 
+	- name: Download llama-server sidecar
+        shell: bash
+        run: |
+          mkdir -p src-tauri/bin
+          if [[ "${{ matrix.platform }}" == "macos-latest" ]]; then
+            # Adjust release tag/asset URL to match your required llama.cpp version
+            curl -L -o /tmp/llama-mac.tar.gz https://github.com/ggerganov/llama.cpp/releases/latest/download/llama-bin-macos-arm64.tar.gz || true
+            tar -xzf /tmp/llama-mac.tar.gz -C src-tauri/bin/ 2>/dev/null || true
+            mv src-tauri/bin/llama-server src-tauri/bin/llama-server-aarch64-apple-darwin 2>/dev/null || touch src-tauri/bin/llama-server-aarch64-apple-darwin
+            chmod +x src-tauri/bin/llama-server*
+          elif [[ "${{ matrix.platform }}" == "windows-latest" ]]; then
+            curl -L -o /tmp/llama-win.zip https://github.com/ggerganov/llama.cpp/releases/latest/download/llama-bin-win-avx2-x64.zip || true
+            unzip -o /tmp/llama-win.zip -d src-tauri/bin/ 2>/dev/null || true
+            mv src-tauri/bin/llama-server.exe src-tauri/bin/llama-server-x86_64-pc-windows-msvc.exe 2>/dev/null || touch src-tauri/bin/llama-server-x86_64-pc-windows-msvc.exe
+          fi
+
       - name: Build Tauri App
         run: npm run tauri build -- --verbose
 
