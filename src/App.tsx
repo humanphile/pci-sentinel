@@ -1,6 +1,21 @@
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import "./App.css";
+import { isTauri } from './utils/env';
+
+export function useServerShutdownGuard() {
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      invoke('stop_inference_server').catch(() => {});
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+}
 
 interface PciControl {
   control_id: string;
@@ -34,16 +49,12 @@ interface ExportResponse {
 interface AuditRecord {
   id: number;
   timestamp: string;
-  framework: string;
-  requirement: string;
+  control_id: string;
+  requirement_number: number;
   status: string;
-  finding: string;
-  remediation: string;
-  evidence: string;
-  sha256_digest: string;
-  signature_b64: string;
-  pubkey_b64: string;
-  export_path: string;
+  summary: string;
+  evidence_hash: string;
+  username: string;
 }
 
 const PCI_REQUIREMENTS = [
@@ -62,7 +73,14 @@ const PCI_REQUIREMENTS = [
 ];
 
 export default function App() {
-  // ==================== ALL HOOKS DECLARED AT THE TOP ====================
+  useServerShutdownGuard();
+
+  // ==================== ALL HOOKS DECLARED AT THE TOP (STRICT RULE) ====================
+  const [isServerReady, setIsServerReady] = useState<boolean>(false);
+  const [bootStatusMsg, setBootStatusMsg] = useState<string>("Initializing Sentinel GRC Secure Enclave...");
+  const [bootError, setBootError] = useState<string | null>(null);
+  const [bootAttempt, setBootAttempt] = useState<number>(0);
+
   const [selectedReqId, setSelectedReqId] = useState<number>(2);
   const [activeGroup, setActiveGroup] = useState<PciRequirementGroup | null>(null);
   const [activeControlIndex, setActiveControlIndex] = useState<number>(0);
@@ -78,30 +96,104 @@ export default function App() {
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  // Password-protected knowledge base reset state
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [adminPassword, setAdminPassword] = useState<string>("");
   const [isResetting, setIsResetting] = useState<boolean>(false);
 
-  // Authentication & Demo State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [mustChangePassword, setMustChangePassword] = useState<boolean>(false);
   const [loginUser, setLoginUser] = useState<string>("demo");
   const [loginPass, setLoginPass] = useState<string>("demo");
   const [newPass, setNewPass] = useState<string>("");
   const [authError, setAuthError] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<string>("demo");
+  const [userRole, setUserRole] = useState<string>(isTauri() ? "admin" : "demo");
 
-  // Subscription & Activation State
   const [showActivationModal, setShowActivationModal] = useState<boolean>(false);
   const [licenseKeyInput, setLicenseKeyInput] = useState<string>("");
   const [machineHwid, setMachineHwid] = useState<string>("");
   const [isActivating, setIsActivating] = useState<boolean>(false);
 
-  // Audit History Search & Filter State
   const [historySearchQuery, setHistorySearchQuery] = useState<string>("");
   const [historyStatusFilter, setHistoryStatusFilter] = useState<string>("ALL");
-  // ======================================================================
+
+  const [showAboutModal, setShowAboutModal] = useState(false);
+
+
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState<boolean>(false);
+  const [oldPasswordInput, setOldPasswordInput] = useState<string>("");
+  const [changeNewPassInput, setChangeNewPassInput] = useState<string>("");
+  const [changePassError, setChangePassError] = useState<string | null>(null);
+
+  const [showShutdownConfirmModal, setShowShutdownConfirmModal] = useState<boolean>(false);
+  
+// ====================================================================================
+
+  // Surface fatal runtime bootstrap failures from the Rust side (download
+  // errors, missing runtime assets, server spawn failures).
+  useEffect(() => {
+    if (!isTauri()) return;
+    let unlisten: (() => void) | undefined;
+    let cancelled = false;
+    (async () => {
+      const un = await listen<string>("bootstrap-error", (event) => {
+        if (!cancelled && event.payload) setBootError(event.payload);
+      });
+      if (cancelled) un();
+      else unlisten = un;
+    })();
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
+  }, []);
+
+  // Poll server health on startup until llama-server is ready. A failed or
+  // missing runtime would otherwise leave the splash screen forever, so we
+  // fail loudly after a generous timeout and offer a Retry path.
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | undefined;
+    const timeout = setTimeout(() => {
+      if (interval) clearInterval(interval);
+      setBootError(
+        "Timed out waiting for the local inference engine to become ready. " +
+        "The runtime may have failed to download or start. Verify your network connection and try again."
+      );
+    }, 120_000);
+
+    interval = setInterval(async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:8090/health');
+        if (res.ok) {
+          clearInterval(interval);
+          clearTimeout(timeout);
+          setIsServerReady(true);
+        }
+      } catch (e) {
+        setBootStatusMsg('Downloading model weights or spinning up secure local inference server...');
+      }
+    }, 1500);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [bootAttempt]);
+
+  const handleRetryBoot = async () => {
+    setBootError(null);
+    setBootStatusMsg("Retrying runtime setup...");
+    if (isTauri()) {
+      try {
+        await invoke("ensure_inference_runtime");
+        await invoke("start_inference_server");
+      } catch (err) {
+        setBootError(String(err));
+        return;
+      }
+    }
+    // Re-arm the health poll (timeout + interval) via a fresh boot attempt.
+    setBootAttempt((n) => n + 1);
+  };
 
   const loadRequirement = async (reqId: number) => {
     try {
@@ -109,7 +201,18 @@ export default function App() {
         requirementNumber: reqId,
       });
 
-      setCompletedAudits({});
+      // Pull the persistent trail from the encrypted SQLite store so switching
+      // requirements never erases previously saved evaluations.
+      let saved: Record<string, AuditResult> = {};
+      try {
+        const recs = await invoke<AuditRecord[]>("get_pci_audit_history");
+        setHistory(recs || []);
+        saved = hydrateCompletedFromHistory(recs || [], reqId);
+      } catch (err) {
+        console.error("Failed to load audit history:", err);
+      }
+
+      setCompletedAudits(saved);
       setCurrentResult(null);
       setLastExport(null);
       setVerificationValid(null);
@@ -119,7 +222,8 @@ export default function App() {
       setActiveControlIndex(0);
 
       if (res && res.controls.length > 0) {
-        setEvidenceText(res.controls[0].sample_evidence || "");
+        const ctrl = res.controls[0];
+        setEvidenceText(saved[ctrl.control_id]?.evidence || ctrl.sample_evidence || "");
       } else {
         setEvidenceText("");
       }
@@ -137,10 +241,30 @@ export default function App() {
     }
   };
 
+  // Rebuild the in-memory progress matrix from the persisted SQLite trail for
+  // a given requirement, so progress survives requirement switches and restarts.
+  const hydrateCompletedFromHistory = (recs: AuditRecord[], reqId: number): Record<string, AuditResult> => {
+    const map: Record<string, AuditResult> = {};
+    for (const rec of recs) {
+      if (rec.requirement_number === reqId) {
+        map[rec.control_id] = {
+          control_id: rec.control_id,
+          status: rec.status,
+          finding: rec.summary,
+          remediation: "",
+          evidence: "",
+        };
+      }
+    }
+    return map;
+  };
+
   useEffect(() => {
-    loadRequirement(2);
-    loadHistory();
-  }, []);
+    if (isServerReady) {
+      loadRequirement(2);
+      loadHistory();
+    }
+  }, [isServerReady]);
 
   const activeControl: PciControl | undefined = activeGroup?.controls[activeControlIndex];
 
@@ -185,13 +309,6 @@ export default function App() {
   const handleEvaluateStep = async () => {
     if (!activeControl || !evidenceText.trim()) return;
 
-    // --- DEMO RESTRICTION CHECK ---
-    if (userRole === "demo" && auditedCount >= 1) {
-      setStatusMessage("⚠️ Demo Limitation: Free trial accounts are restricted to 1 control audit per requirement. Flush memory or upgrade to unlock full access.");
-      return;
-    }
-    // ------------------------------
-
     setIsEvaluating(true);
     setStatusMessage(`QSA Auditing Control ${activeControl.control_id}...`);
 
@@ -206,6 +323,17 @@ export default function App() {
       setCurrentResult(enriched);
       setCompletedAudits((prev) => ({ ...prev, [enriched.control_id]: enriched }));
       setStatusMessage(`✓ Control ${enriched.control_id} evaluated: ${enriched.status}`);
+
+      // Refresh the persistent trail from the encrypted database immediately so
+      // the Trail counter and progress matrix stay in sync with what was saved.
+      try {
+        const recs = await invoke<AuditRecord[]>("get_pci_audit_history");
+        setHistory(recs || []);
+        const hydrated = hydrateCompletedFromHistory(recs || [], selectedReqId);
+        setCompletedAudits((prev) => ({ ...hydrated, ...prev }));
+      } catch (err) {
+        console.error("Failed to refresh audit trail:", err);
+      }
     } catch (err) {
       setStatusMessage("Audit error: " + String(err));
     } finally {
@@ -232,7 +360,13 @@ export default function App() {
   };
 
   const handleExportConsolidated = async () => {
-    if (!activeGroup || Object.keys(completedAudits).length === 0) {
+	if (userRole === "demo") {
+    setStatusMessage("⚠️ Demo Limitation: Consolidated master dossier export requires an enterprise subscription key.");
+    setShowActivationModal(true);
+    return;
+  }   
+
+ if (!activeGroup || Object.keys(completedAudits).length === 0) {
       setStatusMessage("Evaluate at least one control before consolidating.");
       return;
     }
@@ -265,9 +399,10 @@ export default function App() {
   };
 
   const handleFlushAndNextRequirement = async () => {
-    const nextId = selectedReqId < 12 ? selectedReqId + 1 : 1;
+    const currentId = selectedReqId;
+    const nextId = currentId < 12 ? currentId + 1 : 1;
     await loadRequirement(nextId);
-    setStatusMessage(`Requirement ${selectedReqId} memory flushed. Loaded Requirement ${nextId}.`);
+    setStatusMessage(`Requirement ${currentId} memory flushed. Loaded Requirement ${nextId}.`);
   };
 
   const handleResetKnowledgeBase = async () => {
@@ -299,6 +434,10 @@ export default function App() {
       setStatusMessage("Could not open PDF: " + String(err));
     }
   };
+
+  // (PDF viewing is available at export time via the "Open Report" flow; the
+  // persistent trail keeps the finding summary + evidence digest instead of a
+  // file path, since reports are sealed to the user's Desktop.)
 
   const handleVerify = async () => {
     if (!lastExport || !activeGroup) return;
@@ -341,7 +480,7 @@ export default function App() {
 
       if (res.success) {
         setUserRole(res.role);
-        if (res.is_first_login && loginUser === "demo") {
+        if (res.is_first_login) {
           setMustChangePassword(true);
         } else {
           setIsAuthenticated(true);
@@ -357,27 +496,29 @@ export default function App() {
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
-    if (!newPass.trim() || newPass.length < 4) {
-      setAuthError("Password must be at least 4 characters long.");
+    if (!newPass.trim() || newPass.length < 8) {
+      setAuthError("Password must be at least 8 characters long.");
       return;
     }
     try {
       await invoke("update_password", { username: loginUser, newPassword: newPass });
       setMustChangePassword(false);
       setIsAuthenticated(true);
-      setStatusMessage("✓ Password successfully updated. Welcome to PCI-Sentinel.");
+      setStatusMessage("✓ Password successfully updated.");
     } catch (err) {
       setAuthError("Failed to update password: " + String(err));
     }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUserRole("demo");
-    setMustChangePassword(false);
-    setLoginPass("");
-    setStatusMessage("✓ Logged out securely.");
-  };
+ // const handleLogout = () => {
+ //   setIsAuthenticated(false);
+ //   setUserRole("demo");
+ //   setMustChangePassword(false);
+ //   setLoginPass("");
+ //   setStatusMessage("✓ Logged out securely.");
+ // };
+
+
 
   const fetchMachineHwid = async () => {
     try {
@@ -405,7 +546,7 @@ export default function App() {
     try {
       const res = await invoke<string>("activate_subscription_key", {
         username: loginUser,
-        licenseKey: licenseKeyInput.trim(),
+        licenseString: licenseKeyInput.trim(),
       });
       setUserRole("subscriber");
       setStatusMessage(`✓ ${res}`);
@@ -425,10 +566,12 @@ export default function App() {
   const progressPct = totalCount > 0 ? Math.round((auditedCount / totalCount) * 100) : 0;
 
   const filteredHistory = history.filter((rec) => {
+    const reqLabel = `req ${rec.requirement_number}`;
     const matchesQuery = 
-      rec.requirement.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
-      rec.finding.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
-      rec.sha256_digest.toLowerCase().includes(historySearchQuery.toLowerCase());
+      reqLabel.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
+      (rec.control_id ?? "").toLowerCase().includes(historySearchQuery.toLowerCase()) ||
+      rec.summary.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
+      rec.evidence_hash.toLowerCase().includes(historySearchQuery.toLowerCase());
     
     const matchesStatus = 
       historyStatusFilter === "ALL" || rec.status === historyStatusFilter;
@@ -436,13 +579,47 @@ export default function App() {
     return matchesQuery && matchesStatus;
   });
 
-  // ==================== CONDITIONAL RETURN AFTER ALL HOOKS ====================
+  // ==================== CONDITIONAL RENDERS (AFTER ALL HOOKS) ====================
+
+  // 1. Splash screen while server/model boots up
+  if (!isServerReady) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#020617', color: '#f8fafc', fontFamily: 'sans-serif' }}>
+        {!bootError ? (
+          <>
+            <div style={{ width: '48px', height: '48px', border: '4px solid #1e293b', borderTop: '4px solid #38bdf8', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+            <h2 style={{ marginTop: '24px', fontSize: '1.25rem', letterSpacing: '1px', color: '#38bdf8' }}>SENTINEL GRC SECURE ENCLAVE</h2>
+            <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '8px', maxWidth: '400px', textAlign: 'center', lineHeight: '1.4' }}>{bootStatusMsg}</p>
+          </>
+        ) : (
+          <div style={{ maxWidth: '420px', width: '100%', margin: '0 16px', background: '#0f172a', border: '1px solid #991b1b', borderRadius: '12px', padding: '20px' }}>
+            <h2 style={{ fontSize: '1.05rem', letterSpacing: '1px', color: '#fca5a5', margin: '0 0 10px 0' }}>
+              ⚠️ ENCLAVE STARTUP FAILED
+            </h2>
+            <p style={{ color: '#94a3b8', fontSize: '0.78rem', lineHeight: '1.5', margin: '0 0 18px 0', wordBreak: 'break-word' }}>
+              {bootError}
+            </p>
+            <button
+              className="btn-primary"
+              style={{ width: '100%' }}
+              onClick={handleRetryBoot}
+            >
+              🔄 Retry Runtime Setup
+            </button>
+          </div>
+        )}
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  // 2. Login gate if not authenticated
   if (!isAuthenticated) {
     return (
       <div className="app-shell" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", background: "#020617" }}>
         <div className="pane" style={{ width: "400px", padding: "24px", background: "#0f172a", border: "1px solid #1e293b", borderRadius: "12px" }}>
           <h2 style={{ marginBottom: "16px", textAlign: "center", color: "#38bdf8", fontSize: "1.1rem", letterSpacing: "1px" }}>
-            PCI-SENTINEL ACCESS GATE
+            SENTINEL GRC ACCESS GATE
           </h2>
           
           {authError && (
@@ -477,7 +654,7 @@ export default function App() {
           ) : (
             <form onSubmit={handleChangePassword}>
               <div style={{ fontSize: "0.75rem", color: "#38bdf8", marginBottom: "12px", lineHeight: "1.4" }}>
-                First-time login detected for demo account. You must change your password to proceed into the application.
+                First-time login detected. You must set a secure password to proceed into the application.
               </div>
               <label className="label">New Secure Password</label>
               <input 
@@ -486,7 +663,7 @@ export default function App() {
                 style={{ marginBottom: "16px", width: "100%", background: "#020617", color: "#e2e8f0" }}
                 value={newPass}
                 onChange={(e) => setNewPass(e.target.value)}
-                placeholder="Enter new password (min 4 chars)..."
+                placeholder="Enter new password (min 8 chars, letters + numbers + special)..."
               />
               <button type="submit" className="btn-primary" style={{ width: "100%" }}>
                 Update Password & Enter
@@ -497,8 +674,8 @@ export default function App() {
       </div>
     );
   }
-  // ============================================================================
 
+  // ==================== MAIN DASHBOARD RENDER ====================
   return (
     <div className="app-shell">
       <header className="analytics-header">
@@ -700,6 +877,16 @@ export default function App() {
                 <label className="card-label">Last Exported Report</label>
                 <p className="mono-text wrap">{lastExport ? lastExport.export_path.split("/").pop() : "None yet"}</p>
 
+                {lastExport && (
+                  <button
+                    className="btn-export"
+                    style={{ marginTop: "8px" }}
+                    onClick={() => handleOpenPdf(lastExport.export_path)}
+                  >
+                    📄 Open Last Report
+                  </button>
+                )}
+
                 <label className="card-label">Ed25519 Seal Signature</label>
                 <p className="mono-text wrap">{lastExport?.signature_b64 || "Unsealed"}</p>
               </div>
@@ -742,7 +929,6 @@ export default function App() {
                   Verify Active Cryptographic Seal
                 </button>
 
-                {/* Subscription Upgrade Button */}
                 {userRole === "demo" && (
                   <button
                     className="btn-primary"
@@ -807,16 +993,39 @@ export default function App() {
                   </div>
                 )}
 
-                {/* Logout Button */}
-                <button
+<button
+  className="btn-secondary"
+  style={{ width: "100%", marginTop: "8px", background: "#1e293b", borderColor: "#334155", color: "#f8fafc" }}
+  onClick={() => { setShowChangePasswordModal(true); setChangePassError(null); }}
+>
+  🔑 Change Password
+</button>
+
+
+<button
+  className="btn-secondary"
+  style={{ 
+    width: "100%", 
+    marginTop: "8px", 
+    background: "#7f1d1d", 
+    borderColor: "#991b1b", 
+    color: "#fca5a5",
+    fontWeight: "bold" 
+  }}
+  onClick={() => setShowShutdownConfirmModal(true)}
+>
+  🔒 Secure Shutdown
+</button>
+
+                {/* About Sentinel GRC Button */}
+                <button 
+                  onClick={() => setShowAboutModal(true)}
                   className="btn-secondary"
-                  style={{ width: "100%", marginTop: "12px", background: "#334155", borderColor: "#475569", color: "#f8fafc" }}
-                  onClick={handleLogout}
-                >
-                  🚪 Secure Logout
+  style={{ width: "100%", marginTop: "8px", background: "#1e293b", borderColor: "#334155", color: "#f8fafc" }}
+>
+                  ℹ️ About Sentinel GRC
                 </button>
 
-                {/* Password Protected Reset Button */}
                 <button
                   className="btn-secondary"
                   style={{ width: "100%", marginTop: "8px", background: "#7f1d1d", borderColor: "#991b1b", color: "#fca5a5" }}
@@ -867,7 +1076,6 @@ export default function App() {
             <div className="history-list">
               <label className="label">SEALED DOSSIERS ({filteredHistory.length} of {history.length})</label>
               
-              {/* Search & Filter Controls */}
               <div style={{ display: "flex", gap: "6px", marginBottom: "8px" }}>
                 <input
                   type="text"
@@ -902,18 +1110,12 @@ export default function App() {
                         {rec.status}
                       </span>
                     </div>
-                    <div className="history-title">{rec.requirement}</div>
-                    <div className="history-date">{rec.timestamp}</div>
-                    <div className="history-digest">SHA: {rec.sha256_digest.substring(0, 16)}...</div>
-
-                    {rec.export_path ? (
-                      <button
-                        className="btn-open-report"
-                        onClick={() => handleOpenPdf(rec.export_path)}
-                      >
-                        📄 Open Report PDF
-                      </button>
-                    ) : null}
+                    <div className="history-title">Req {rec.requirement_number} · Control {rec.control_id}</div>
+                    <main className="history-date">{rec.timestamp}</main>
+                    <div className="history-digest">Evidence SHA-256: {rec.evidence_hash ? rec.evidence_hash.substring(0, 16) : "—"}...</div>
+                    <div style={{ fontSize: "0.65rem", color: "#94a3b8", marginTop: "4px", lineHeight: "1.4" }}>
+                      {rec.summary ? rec.summary.substring(0, 140) : "No finding summary recorded."}
+                    </div>
                   </div>
                 ))
               )}
@@ -921,6 +1123,200 @@ export default function App() {
           )}
         </section>
       </div>
+
+      {/* About Modal Overlay */}
+      {showAboutModal && (
+  <div style={{
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    backgroundColor: "rgba(2, 6, 23, 0.8)",
+    backdropFilter: "blur(4px)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 9999,
+    padding: "16px"
+  }}>
+    <div style={{
+      backgroundColor: "#0f172a",
+      border: "1px solid #334155",
+      borderRadius: "12px",
+      maxWidth: "500px",
+      width: "100%",
+      padding: "24px",
+      color: "#f8fafc",
+      boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.7)",
+      position: "relative"
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", borderBottom: "1px solid #1e293b", paddingBottom: "12px", marginBottom: "16px" }}>
+        <div>
+          <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#34d399", margin: 0 }}>Sentinel GRC — Secure Enclave Suite</h3>
+          <p style={{ fontSize: "0.7rem", color: "#94a3b8", margin: "4px 0 0 0" }}>Enterprise Air-Gapped Compliance Engine v1.0.0</p>
+        </div>
+        <button 
+          onClick={() => setShowAboutModal(false)}
+          style={{ background: "transparent", border: "none", color: "#94a3b8", fontSize: "1.1rem", cursor: "pointer", padding: "0 4px" }}
+        >
+          ✕
+        </button>
+      </div>
+
+      <div style={{ fontSize: "0.75rem", color: "#cbd5e1", lineHeight: "1.5", display: "flex", flexDirection: "column", gap: "12px" }}>
+        <div style={{ background: "#020617", padding: "10px", borderRadius: "8px", border: "1px solid #1e293b" }}>
+          <p style={{ margin: "0 0 4px 0" }}><strong>Principal Assessor:</strong> Ahmad Adnan</p>
+          <p style={{ margin: 0 }}><strong>Contact:</strong> sentinel-grc@proton.me</p>
+        </div>
+        <p style={{ margin: 0 }}>
+          Sentinel GRC is an elite, air-gapped compliance auditing and cryptographic attestation engine designed for high-security environments. It enables automated, local-first assessment without transmitting sensitive data across public networks.
+        </p>
+        <div style={{ borderTop: "1px solid #1e293b", paddingTop: "8px", display: "flex", flexDirection: "column", gap: "4px" }}>
+          <p style={{ margin: 0 }}>🔒 <strong>Active Enclave:</strong> Apple Silicon Metal / Local GGML Qwen 2.5</p>
+          <p style={{ margin: 0 }}>🛡️ <strong>Cryptography:</strong> Ed25519 Asymmetric Seals & SHA-256 Digests</p>
+          <p style={{ margin: 0 }}>🗺️ <strong>Framework Roadmap:</strong> PCI DSS v4.0.1, ISO/IEC 27001, NCA, PDPL</p>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px", borderTop: "1px solid #1e293b", paddingTop: "12px" }}>
+        <button 
+          onClick={() => setShowAboutModal(false)}
+          className="btn-primary"
+          style={{ fontSize: "0.75rem", padding: "8px 16px", background: "#059669" }}
+        >
+          Close Enclave Info
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{showChangePasswordModal && (
+  <div style={{
+    position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+    backgroundColor: "rgba(2, 6, 23, 0.8)", backdropFilter: "blur(4px)",
+    display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "16px"
+  }}>
+    <div style={{
+      backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: "12px",
+      maxWidth: "400px", width: "100%", padding: "24px", color: "#f8fafc", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.7)"
+    }}>
+      <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#38bdf8", marginBottom: "12px" }}>Change Account Password</h3>
+      <p style={{ fontSize: "0.7rem", color: "#94a3b8", marginBottom: "16px", lineHeight: "1.4" }}>
+        Password must be at least 8 characters and include letters, numbers, and a special character.
+      </p>
+
+      {changePassError && (
+        <div style={{ marginBottom: "12px", padding: "8px", background: "#7f1d1d", color: "#fca5a5", fontSize: "0.7rem", borderRadius: "6px", border: "1px solid #991b1b" }}>
+          {changePassError}
+        </div>
+      )}
+
+      <form onSubmit={async (e) => {
+        e.preventDefault();
+        setChangePassError(null);
+        try {
+          const res = await invoke<string>("update_password", {
+            username: loginUser,
+            oldPassword: oldPasswordInput,
+            newPassword: changeNewPassInput,
+          });
+          setStatusMessage(`✓ ${res}`);
+          setShowChangePasswordModal(false);
+          setOldPasswordInput("");
+          setChangeNewPassInput("");
+        } catch (err) {
+          setChangePassError(String(err));
+        }
+      }}>
+        <label className="label" style={{ fontSize: "0.7rem" }}>Current Password</label>
+        <input
+          type="password"
+          className="select-box"
+          style={{ marginBottom: "10px", width: "100%", background: "#020617", color: "#e2e8f0", fontSize: "0.75rem", padding: "6px" }}
+          value={oldPasswordInput}
+          onChange={(e) => setOldPasswordInput(e.target.value)}
+          placeholder="Enter current password..."
+        />
+
+        <label className="label" style={{ fontSize: "0.7rem" }}>New Secure Password</label>
+        <input
+          type="password"
+          className="select-box"
+          style={{ marginBottom: "16px", width: "100%", background: "#020617", color: "#e2e8f0", fontSize: "0.75rem", padding: "6px" }}
+          value={changeNewPassInput}
+          onChange={(e) => setChangeNewPassInput(e.target.value)}
+          placeholder="Min 8 chars, alphanumeric & special..."
+        />
+
+        <div style={{ display: "flex", gap: "6px" }}>
+          <button type="submit" className="btn-primary" style={{ flex: 1, fontSize: "0.75rem", padding: "8px" }}>
+            Update Password
+          </button>
+          <button
+            type="button"
+            className="btn-secondary"
+            style={{ flex: 1, fontSize: "0.75rem", padding: "8px" }}
+            onClick={() => setShowChangePasswordModal(false)}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
+
+{showShutdownConfirmModal && (
+  <div style={{
+    position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+    backgroundColor: "rgba(2, 6, 23, 0.85)", backdropFilter: "blur(4px)",
+    display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "16px"
+  }}>
+    <div style={{
+      backgroundColor: "#0f172a", border: "1px solid #7f1d1d", borderRadius: "12px",
+      maxWidth: "420px", width: "100%", padding: "24px", color: "#f8fafc", 
+      boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.8)"
+    }}>
+      <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#fca5a5", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+        ⚠️ Confirm Secure Shutdown
+      </h3>
+      <p style={{ fontSize: "0.75rem", color: "#94a3b8", marginBottom: "20px", lineHeight: "1.5" }}>
+        This will forcefully terminate the local inference engine, release network ports, purge memory enclaves, and exit Sentinel GRC completely. 
+      </p>
+
+      <div style={{ display: "flex", gap: "8px" }}>
+        <button
+          type="button"
+          className="btn-primary"
+          style={{ flex: 1, fontSize: "0.75rem", padding: "10px", background: "#7f1d1d", borderColor: "#991b1b", color: "#fff" }}
+          onClick={async () => {
+            try {
+              await invoke("secure_shutdown");
+            } catch (err) {
+              console.error("Secure shutdown failed:", err);
+            }
+          }}
+        >
+          Yes, Shut Down
+        </button>
+        <button
+          type="button"
+          className="btn-secondary"
+          style={{ flex: 1, fontSize: "0.75rem", padding: "10px", background: "#1e293b", borderColor: "#334155", color: "#f8fafc" }}
+          onClick={() => setShowShutdownConfirmModal(false)}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
     </div>
   );
 }

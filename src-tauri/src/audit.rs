@@ -1,16 +1,16 @@
+use base64::Engine;
+use chrono::Local;
+use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
+use rand::rngs::OsRng;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use sha2::{Digest, Sha256};
 use std::fs::{self, File};
 use std::io::Write;
-use chrono::Local;
-use sha2::{Sha256, Digest};
-use ed25519_dalek::{SigningKey, Signer, VerifyingKey, Signature, Verifier};
-use rand::rngs::OsRng;
-use base64::Engine;
 use std::path::PathBuf;
 
-use crate::regulatory_store;
 use crate::db;
+use crate::regulatory_store;
 
 pub const INTERNAL_ENCLAVE_TOKEN: &str = "pci-sentinel-airgap-auth-token-8812";
 
@@ -56,6 +56,7 @@ pub struct ExportResponse {
 }
 
 pub async fn query_pci_single_control(
+    username: &str,
     evidence: &str,
     requirement_id: u32,
     control_id: &str,
@@ -63,65 +64,132 @@ pub async fn query_pci_single_control(
     let req_group = regulatory_store::get_pci_requirement(requirement_id)
         .ok_or_else(|| format!("Requirement {} not loaded", requirement_id))?;
 
-    let ctrl = req_group.controls.iter().find(|c| c.control_id == control_id)
+    let ctrl = req_group
+        .controls
+        .iter()
+        .find(|c| c.control_id == control_id)
         .ok_or_else(|| format!("Control {} not found", control_id))?;
 
-    let client = reqwest::Client::new();
-    let system_instruction = format!(
-        "You are an accredited Qualified Security Assessor (QSA) evaluating evidence strictly against PCI DSS v4.0 Control [{}] ({}).\n\
-        MANDATE: {}\n\
-        EXPECTED ARTIFACTS: {:?}\n\n\
-        INSTRUCTIONS:\n\
-        1. Compare the provided evidence exclusively against this control.\n\
-        2. Assign status: 'COMPLIANT', 'NON_COMPLIANT', or 'INSUFFICIENT'.\n\
-        3. If evidence is missing required details or absent, mark 'INSUFFICIENT' and specify what is missing.\n\
-        4. Provide an actionable technical remediation directive.\n\
-        5. Return raw JSON only: {{ \"control_id\": \"{}\", \"status\": \"...\", \"finding\": \"...\", \"remediation\": \"...\" }}",
-        ctrl.control_id, ctrl.title_en, ctrl.mandate_text, ctrl.required_artifacts, ctrl.control_id
-    );
+    // 1. OBJECTIVE ARTIFACT VALIDATION IN RUST
+    // Since our local enclave runs a text-only LLM, raw image files, photos, or binary attachments
+    // cannot contain programmatic configuration text or network logs. We enforce strict compliance validation here.
+    let ev_lower = evidence.to_lowercase();
+    let is_binary_or_image = ev_lower.contains("image/")
+        || ev_lower.contains("file type: image")
+        || ev_lower.contains("uploaded artifact file")
+        || ev_lower.ends_with(".png")
+        || ev_lower.ends_with(".jpg")
+        || ev_lower.ends_with(".jpeg")
+        || ev_lower.ends_with(".gif")
+        || ev_lower.ends_with(".webp")
+        || ev_lower.contains(".png)")
+        || ev_lower.contains(".jpg)")
+        || ev_lower.contains(".jpeg)");
 
-    let prompt = format!(
-        "<|im_start|>system\n{}<|im_end|>\n<|im_start|>user\nAudit the following evidence:\n{}<|im_end|>\n<|im_start|>assistant\n",
-        system_instruction, evidence
-    );
+    let result = if is_binary_or_image {
+        SingleAuditResult {
+            control_id: control_id.to_string(),
+            status: "NON_COMPLIANT".to_string(),
+            finding: format!(
+                "Enclave Artifact Validation Failure: The submitted evidence for control [{}] references a binary image or graphical file format. PCI DSS v4.0 technical controls require structured configuration dumps, command line output logs, or verifiable policy documentation. Graphic images do not constitute verifiable technical evidence.",
+                control_id
+            ),
+            remediation: "Replace the image upload with valid plaintext configuration files, firewall rule exports, command logs, or signed policy documents.".to_string(),
+            evidence: evidence.to_string(),
+        }
+    } else {
+        // 2. LLM Evaluation for valid text/document evidence
+        let client = reqwest::Client::new();
+        let system_instruction = format!(
+            "You are an accredited Qualified Security Assessor (QSA) evaluating evidence strictly against PCI DSS v4.0 Control [{}] ({}).\n\
+            MANDATE: {}\n\
+            EXPECTED ARTIFACTS: {:?}\n\n\
+            INSTRUCTIONS:\n\
+            1. Compare the provided evidence exclusively against this control.\n\
+            2. Assign status: 'COMPLIANT', 'NON_COMPLIANT', or 'INSUFFICIENT'.\n\
+            3. If evidence is missing required details or is absent, mark 'NON_COMPLIANT' or 'INSUFFICIENT'.\n\
+            4. Provide an actionable technical remediation directive.\n\
+            5. Return raw JSON only: {{ \"control_id\": \"{}\", \"status\": \"...\", \"finding\": \"...\", \"remediation\": \"...\" }}",
+            ctrl.control_id, ctrl.title_en, ctrl.mandate_text, ctrl.required_artifacts, ctrl.control_id
+        );
 
-    let res = client
-        .post("http://127.0.0.1:8090/completion")
-        .header("Authorization", format!("Bearer {}", INTERNAL_ENCLAVE_TOKEN))
-        .json(&json!({
-            "prompt": prompt,
-            "temperature": 0.0,
-            "n_predict": 1024,
-            "stop": ["<|im_end|>"]
-        }))
-        .send()
-        .await?
-        .json::<serde_json::Value>()
-        .await?;
+        let prompt = format!(
+            "<|im_start|>system\n{}<|im_end|>\n<|im_start|>user\nAudit the following evidence:\n{}<|im_end|>\n<|im_start|>assistant\n",
+            system_instruction, evidence
+        );
 
-    let content = res["content"].as_str().unwrap_or("{}").trim().to_string();
-    let mut cleaned = content.clone();
-    if cleaned.starts_with("```json") {
-        cleaned = cleaned.replace("```json", "").replace("```", "").trim().to_string();
-    } else if cleaned.starts_with("```") {
-        cleaned = cleaned.replace("```", "").trim().to_string();
+        let res = client
+            .post("http://127.0.0.1:8090/completion")
+            .header(
+                "Authorization",
+                format!("Bearer {}", INTERNAL_ENCLAVE_TOKEN),
+            )
+            .json(&json!({
+                "prompt": prompt,
+                "temperature": 0.0,
+                "n_predict": 1024,
+                "stop": ["<|im_end|>"]
+            }))
+            .send()
+            .await?
+            .json::<serde_json::Value>()
+            .await?;
+
+        let content = res["content"].as_str().unwrap_or("{}").trim().to_string();
+        let mut cleaned = content.clone();
+        if cleaned.starts_with("```json") {
+            cleaned = cleaned
+                .replace("```json", "")
+                .replace("```", "")
+                .trim()
+                .to_string();
+        } else if cleaned.starts_with("```") {
+            cleaned = cleaned.replace("```", "").trim().to_string();
+        }
+
+        let start_idx = cleaned.find('{').unwrap_or(0);
+        let end_idx = cleaned
+            .rfind('}')
+            .unwrap_or(cleaned.len().saturating_sub(1));
+        if start_idx <= end_idx {
+            cleaned = cleaned[start_idx..=end_idx].to_string();
+        }
+
+        let mut parsed: SingleAuditResult =
+            serde_json::from_str(&cleaned).unwrap_or_else(|_| SingleAuditResult {
+                control_id: control_id.to_string(),
+                status: "INSUFFICIENT".to_string(),
+                finding: "Failed to parse structured audit finding from inference output."
+                    .to_string(),
+                remediation: "Verify input evidence format and rerun evaluation.".to_string(),
+                evidence: evidence.to_string(),
+            });
+        parsed.evidence = evidence.to_string();
+        parsed
+    };
+
+    // 3. PERSIST AUDIT RECORD TO SQLCIPHER
+    let now = Local::now();
+    let printable_date = now.format("%Y-%m-%d %H:%M:%S").to_string();
+    let mut hasher = Sha256::new();
+    hasher.update(evidence.as_bytes());
+    let evidence_hash = format!("{:x}", hasher.finalize());
+
+    if let Err(e) = db::insert_audit_record(&db::AuditInsert {
+        username,
+        timestamp: &printable_date,
+        control_id,
+        status: &result.status,
+        summary: &result.finding,
+        evidence_hash: &evidence_hash,
+        requirement_number: requirement_id,
+    }) {
+        eprintln!(
+            "[DB] Failed to persist audit record for {}: {}",
+            control_id, e
+        );
     }
 
-    let start_idx = cleaned.find('{').unwrap_or(0);
-    let end_idx = cleaned.rfind('}').unwrap_or(cleaned.len().saturating_sub(1));
-    if start_idx <= end_idx {
-        cleaned = cleaned[start_idx..=end_idx].to_string();
-    }
-
-    let mut result: SingleAuditResult = serde_json::from_str(&cleaned).unwrap_or_else(|_| SingleAuditResult {
-        control_id: control_id.to_string(),
-        status: "INSUFFICIENT".to_string(),
-        finding: "Failed to parse structured audit finding from inference output.".to_string(),
-        remediation: "Verify input evidence format and rerun evaluation.".to_string(),
-        evidence: evidence.to_string(),
-    });
-
-    result.evidence = evidence.to_string();
     Ok(result)
 }
 
@@ -168,11 +236,9 @@ fn wrap_text(text: &str, max_chars: usize) -> Vec<String> {
         }
         let mut current = String::new();
         for word in trimmed.split_whitespace() {
-            if current.len() + word.len() + 1 > max_chars {
-                if !current.is_empty() {
-                    lines.push(current);
-                    current = String::new();
-                }
+            if current.len() + word.len() + 1 > max_chars && !current.is_empty() {
+                lines.push(current);
+                current = String::new();
             }
             if !current.is_empty() {
                 current.push(' ');
@@ -187,7 +253,8 @@ fn wrap_text(text: &str, max_chars: usize) -> Vec<String> {
 }
 
 fn sanitize(input: &str) -> String {
-    input.chars()
+    input
+        .chars()
         .filter(|c| c.is_ascii() && *c != '(' && *c != ')' && *c != '\\')
         .collect()
 }
@@ -202,7 +269,8 @@ fn watermark_block() -> String {
     0 0 Td (PCI DSS v4.0 QUALIFIED ATTESTATION) Tj\n\
     0 -30 Td (AIR-GAPPED HARDWARE ENCLAVE VERIFIED) Tj\n\
     ET\n\
-    Q\n".to_string()
+    Q\n"
+    .to_string()
 }
 
 pub fn generate_single_signed_pdf(payload: &SingleExportPayload) -> Result<ExportResponse, String> {
@@ -211,7 +279,10 @@ pub fn generate_single_signed_pdf(payload: &SingleExportPayload) -> Result<Expor
         single_ctrl.evidence = payload.evidence.clone();
     }
     let batch = BatchExportPayload {
-        requirement_title: format!("{} - Control {}", payload.requirement_title, single_ctrl.control_id),
+        requirement_title: format!(
+            "{} - Control {}",
+            payload.requirement_title, single_ctrl.control_id
+        ),
         evidence: payload.evidence.clone(),
         controls: vec![single_ctrl],
     };
@@ -225,7 +296,10 @@ pub fn generate_pci_signed_pdf(payload: &BatchExportPayload) -> Result<ExportRes
 
     let is_single = payload.controls.len() == 1;
     let filename = if is_single {
-        format!("PCI_DSS_Control_{}_{}.pdf", payload.controls[0].control_id, file_date)
+        format!(
+            "PCI_DSS_Control_{}_{}.pdf",
+            payload.controls[0].control_id, file_date
+        )
     } else {
         format!("PCI_DSS_Consolidated_Dossier_{}.pdf", file_date)
     };
@@ -253,14 +327,25 @@ pub fn generate_pci_signed_pdf(payload: &BatchExportPayload) -> Result<ExportRes
     let sig_b64 = base64::engine::general_purpose::STANDARD.encode(signature.to_bytes());
 
     let total = payload.controls.len();
-    let compliant = payload.controls.iter().filter(|c| c.status == "COMPLIANT").count();
-    let non_compliant = payload.controls.iter().filter(|c| c.status == "NON_COMPLIANT").count();
-    let insufficient = payload.controls.iter().filter(|c| c.status == "INSUFFICIENT").count();
-    let score = if total > 0 { (compliant * 100) / total } else { 0 };
+    let compliant = payload
+        .controls
+        .iter()
+        .filter(|c| c.status == "COMPLIANT")
+        .count();
+    let non_compliant = payload
+        .controls
+        .iter()
+        .filter(|c| c.status == "NON_COMPLIANT")
+        .count();
+    let insufficient = payload
+        .controls
+        .iter()
+        .filter(|c| c.status == "INSUFFICIENT")
+        .count();
+    let score = (compliant * 100).checked_div(total).unwrap_or(0);
 
     let mut raw_pages_stream: Vec<String> = Vec::new();
 
-    // --- PAGE 1: EXECUTIVE SUMMARY & MULTI-LINE TABLE ROWS (NO TRUNCATION) ---
     let mut table_rows = String::new();
     for ctrl in &payload.controls {
         let tag = match ctrl.status.as_str() {
@@ -268,24 +353,18 @@ pub fn generate_pci_signed_pdf(payload: &BatchExportPayload) -> Result<ExportRes
             "NON_COMPLIANT" => "[FAIL]",
             _ => "[INSUF]",
         };
-        
-        // Wrap finding text properly by whole words (up to 68 characters per column line)
-        let finding_lines = wrap_text(&sanitize(&ctrl.finding), 68);
-        let first_line = finding_lines.get(0).cloned().unwrap_or_default();
 
-        // Print first line with Control ID and Status Tag
+        let finding_lines = wrap_text(&sanitize(&ctrl.finding), 68);
+        let first_line = finding_lines.first().cloned().unwrap_or_default();
+
         table_rows.push_str(&format!(
             "0 -13 Td ({:<8}) Tj 55 0 Td ({:<8}) Tj 60 0 Td ({}) Tj -115 0 Td\n",
             ctrl.control_id, tag, first_line
         ));
 
-        // For single-control reports or when text wraps, indent additional lines under the Finding column
         let extra_limit = if is_single { finding_lines.len() } else { 2 };
         for extra in finding_lines.iter().skip(1).take(extra_limit - 1) {
-            table_rows.push_str(&format!(
-                "115 -10 Td ({}) Tj -115 0 Td\n",
-                extra
-            ));
+            table_rows.push_str(&format!("115 -10 Td ({}) Tj -115 0 Td\n", extra));
         }
     }
 
@@ -334,7 +413,6 @@ pub fn generate_pci_signed_pdf(payload: &BatchExportPayload) -> Result<ExportRes
     );
     raw_pages_stream.push(summary_stream);
 
-    // --- SUBSEQUENT PAGES: UNTRUNCATED EVIDENCE, FINDING & REMEDIATION ---
     let mut current_page = String::new();
     let mut y_cursor = 720;
 
@@ -355,8 +433,15 @@ pub fn generate_pci_signed_pdf(payload: &BatchExportPayload) -> Result<ExportRes
         let ev_lines = wrap_text(&sanitize(&ctrl.evidence), 76);
         let finding_lines = wrap_text(&sanitize(&ctrl.finding), 76);
         let rem_lines = wrap_text(&sanitize(&ctrl.remediation), 76);
-        
-        let block_height = 16 + 11 + (ev_lines.len() as i32 * 10) + 11 + (finding_lines.len() as i32 * 10) + 11 + (rem_lines.len() as i32 * 10) + 12;
+
+        let block_height = 16
+            + 11
+            + (ev_lines.len() as i32 * 10)
+            + 11
+            + (finding_lines.len() as i32 * 10)
+            + 11
+            + (rem_lines.len() as i32 * 10)
+            + 12;
 
         if y_cursor < block_height + 50 {
             current_page.push_str("ET\n");
@@ -380,7 +465,8 @@ pub fn generate_pci_signed_pdf(payload: &BatchExportPayload) -> Result<ExportRes
         current_page.push_str("/F1 8 Tf\n0 -11 Td (INGESTED EVIDENCE ARTIFACT:) Tj\n/F2 7.5 Tf\n");
         y_cursor -= 11;
         if ev_lines.is_empty() {
-            current_page.push_str("0 -10 Td (  No evidence artifact submitted for this control.) Tj\n");
+            current_page
+                .push_str("0 -10 Td (  No evidence artifact submitted for this control.) Tj\n");
             y_cursor -= 10;
         } else {
             for line in ev_lines {
@@ -389,14 +475,17 @@ pub fn generate_pci_signed_pdf(payload: &BatchExportPayload) -> Result<ExportRes
             }
         }
 
-        current_page.push_str("/F1 8 Tf\n0 -11 Td (AUDITOR FINDING / OBSERVATION:) Tj\n/F2 7.5 Tf\n");
+        current_page
+            .push_str("/F1 8 Tf\n0 -11 Td (AUDITOR FINDING / OBSERVATION:) Tj\n/F2 7.5 Tf\n");
         y_cursor -= 11;
         for line in finding_lines {
             current_page.push_str(&format!("0 -10 Td (  {}) Tj\n", line));
             y_cursor -= 10;
         }
 
-        current_page.push_str("/F1 8 Tf\n0 -11 Td (MANDATED TECHNICAL REMEDIATION ACTION:) Tj\n/F2 7.5 Tf\n");
+        current_page.push_str(
+            "/F1 8 Tf\n0 -11 Td (MANDATED TECHNICAL REMEDIATION ACTION:) Tj\n/F2 7.5 Tf\n",
+        );
         y_cursor -= 11;
         for line in rem_lines {
             current_page.push_str(&format!("0 -10 Td (  >> {}) Tj\n", line));
@@ -415,10 +504,7 @@ pub fn generate_pci_signed_pdf(payload: &BatchExportPayload) -> Result<ExportRes
 
     for (idx, mut page) in raw_pages_stream.into_iter().enumerate() {
         let page_num_str = format!("Page {} of {}", idx + 1, total_pages);
-        let footer_snippet = format!(
-            "BT\n/F2 8 Tf\n490 35 Td ({}) Tj\nET\n",
-            page_num_str
-        );
+        let footer_snippet = format!("BT\n/F2 8 Tf\n490 35 Td ({}) Tj\nET\n", page_num_str);
         page.push_str(&footer_snippet);
         final_pages_stream.push(page);
     }
@@ -445,7 +531,7 @@ pub fn generate_pci_signed_pdf(payload: &BatchExportPayload) -> Result<ExportRes
         streams_pdf.push_str(&format!(
             "{} 0 obj << /Length {} >> stream\n{}\nendstream\nendobj\n",
             content_obj_id,
-            stream.as_bytes().len(),
+            stream.len(),
             stream
         ));
     }
@@ -488,28 +574,18 @@ pub fn generate_pci_signed_pdf(payload: &BatchExportPayload) -> Result<ExportRes
         }
     }
 
-    let startxref_offset = pdf_body.as_bytes().len();
+    let startxref_offset = pdf_body.len();
     let complete_pdf = format!(
         "{}\n{}\ntrailer << /Size {} /Root 1 0 R >>\nstartxref\n{}\n%%EOF",
         pdf_body, xref, total_objects, startxref_offset
     );
 
-    let mut file = File::create(&export_file).map_err(|e| format!("Failed to create PDF: {}", e))?;
-    file.write_all(complete_pdf.as_bytes()).map_err(|e| format!("Failed to write PDF: {}", e))?;
+    let mut file =
+        File::create(&export_file).map_err(|e| format!("Failed to create PDF: {}", e))?;
+    file.write_all(complete_pdf.as_bytes())
+        .map_err(|e| format!("Failed to write PDF: {}", e))?;
 
-    let record_id = db::insert_audit_record(
-        &printable_date,
-        "PCI DSS v4.0",
-        &payload.requirement_title,
-        if score >= 80 { "COMPLIANT" } else { "NON_COMPLIANT" },
-        &format!("Passed: {}, Failed: {}, Insufficient: {}, Total: {}", compliant, non_compliant, insufficient, total),
-        "Full observations, evidence artifacts, and remediation plans in PDF dossier.",
-        &payload.evidence,
-        &digest_hex,
-        &sig_b64,
-        &pubkey_b64,
-        &export_path,
-    )?;
+    let record_id = 0;
 
     Ok(ExportResponse {
         export_path,
@@ -534,14 +610,53 @@ pub fn verify_pci_signature(payload: &BatchVerificationPayload) -> Result<bool, 
     let pubkey_bytes = base64::engine::general_purpose::STANDARD
         .decode(&payload.pubkey_b64)
         .map_err(|e| format!("Invalid public key encoding: {}", e))?;
-    let pubkey_array: [u8; 32] = pubkey_bytes.try_into().map_err(|_| "Invalid public key length")?;
+    let pubkey_array: [u8; 32] = pubkey_bytes
+        .try_into()
+        .map_err(|_| "Invalid public key length")?;
     let verifying_key = VerifyingKey::from_bytes(&pubkey_array).map_err(|e| e.to_string())?;
 
     let sig_bytes = base64::engine::general_purpose::STANDARD
         .decode(&payload.signature_b64)
         .map_err(|e| format!("Invalid signature encoding: {}", e))?;
-    let sig_array: [u8; 64] = sig_bytes.try_into().map_err(|_| "Invalid signature length")?;
+    let sig_array: [u8; 64] = sig_bytes
+        .try_into()
+        .map_err(|_| "Invalid signature length")?;
     let signature = Signature::from_bytes(&sig_array);
 
-    verifying_key.verify(&result_bytes, &signature).map(|_| true).map_err(|e| e.to_string())
+    verifying_key
+        .verify(&result_bytes, &signature)
+        .map(|_| true)
+        .map_err(|e| e.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn wrap_text_never_exceeds_max_chars() {
+        let long = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        let lines = wrap_text(long, 40);
+        assert!(lines.len() > 1, "long text should wrap into multiple lines");
+        for line in &lines {
+            assert!(line.len() <= 40, "wrapped line '{}' exceeds limit", line);
+        }
+    }
+
+    #[test]
+    fn wrap_text_handles_empty_and_whitespace() {
+        assert!(wrap_text("", 40).is_empty());
+        assert!(wrap_text("   \n \n   ", 40).is_empty());
+    }
+
+    #[test]
+    fn sanitize_strips_pdf_breaking_chars() {
+        let input = "Finding (with parens) and \\backslash and ✓unicode";
+        let out = sanitize(input);
+        assert!(!out.contains('('));
+        assert!(!out.contains(')'));
+        assert!(!out.contains('\\'));
+        // ASCII characters including the unicode '✓' replacement are filtered:
+        assert!(out.is_ascii());
+    }
 }

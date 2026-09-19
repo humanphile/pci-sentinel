@@ -24,14 +24,17 @@ pub fn get_pci_requirement(req_id: u32) -> Option<PciRequirementGroup> {
     let mut candidate_paths = vec![
         PathBuf::from("baselines/pci_dss").join(&filename),
         PathBuf::from("src-tauri/baselines/pci_dss").join(&filename),
-        PathBuf::from("/Users/ahmadnan/pci-sentinel/src-tauri/baselines/pci_dss").join(&filename),
     ];
 
     if let Ok(exe_path) = std::env::current_exe() {
         if let Some(dir) = exe_path.parent() {
+            // macOS bundle layout
             candidate_paths.push(dir.join("baselines/pci_dss").join(&filename));
             candidate_paths.push(dir.join("../Resources/baselines/pci_dss").join(&filename));
             candidate_paths.push(dir.join("../../baselines/pci_dss").join(&filename));
+            // Windows / Linux resource layouts
+            candidate_paths.push(dir.join("resources/baselines/pci_dss").join(&filename));
+            candidate_paths.push(dir.join("../resources/baselines/pci_dss").join(&filename));
         }
     }
 
