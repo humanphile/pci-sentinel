@@ -159,24 +159,108 @@ fn extract_artifact_name(evidence: &str) -> String {
     "uploaded artifact".to_string()
 }
 
-/// Evaluate free-text evidence against a control with the local LLM.
+/// Draft response schema requested from the LLM. It is a superset of
+/// [`SingleAuditResult`]; unknown/missing fields are tolerated by serde, so a
+/// model that omits the artifact arrays still produces a valid evaluation.
+#[derive(Deserialize)]
+struct AuditDraft {
+    #[serde(default)]
+    control_id: String,
+    #[serde(default)]
+    status: String,
+    #[serde(default)]
+    finding: String,
+    #[serde(default)]
+    remediation: String,
+    #[serde(default)]
+    met_artifacts: Vec<String>,
+    #[serde(default)]
+    missing_artifacts: Vec<String>,
+}
+
+/// Strip markdown fences and stray prose so the LLM response can be parsed as
+/// a single JSON object.
+fn clean_llm_json(content: &str) -> String {
+    let mut cleaned = content.trim().to_string();
+    if cleaned.starts_with("```json") {
+        cleaned = cleaned
+            .replace("```json", "")
+            .replace("```", "")
+            .trim()
+            .to_string();
+    } else if cleaned.starts_with("```") {
+        cleaned = cleaned.replace("```", "").trim().to_string();
+    }
+
+    let start_idx = cleaned.find('{').unwrap_or(0);
+    let end_idx = cleaned
+        .rfind('}')
+        .unwrap_or(cleaned.len().saturating_sub(1));
+    if start_idx <= end_idx {
+        cleaned = cleaned[start_idx..=end_idx].to_string();
+    }
+    cleaned
+}
+
+/// Build the human-readable finding: a deterministic MET/MISSING citation
+/// header followed by the assessor's technical rationale.
+fn compose_finding(met: &[String], missing: &[String], prose: &str) -> String {
+    let mut parts: Vec<String> = Vec::new();
+    if !met.is_empty() {
+        parts.push(format!("MET: {}", met.join(", ")));
+    }
+    if !missing.is_empty() {
+        parts.push(format!("MISSING: {}", missing.join(", ")));
+    }
+    let mut out = parts.join(". ");
+    let prose = prose.trim();
+    if !prose.is_empty() {
+        if !out.is_empty() {
+            out.push_str(". ");
+        }
+        out.push_str(prose);
+    }
+    out
+}
+
+/// Normalize the model status to the three accepted verdicts.
+fn normalize_status(raw: &str) -> Option<&'static str> {
+    match raw.trim().to_uppercase().as_str() {
+        "COMPLIANT" => Some("COMPLIANT"),
+        "NON_COMPLIANT" => Some("NON_COMPLIANT"),
+        "INSUFFICIENT" => Some("INSUFFICIENT"),
+        _ => None,
+    }
+}
+
+/// Evaluate free-text evidence against a control with the local LLM. The
+/// system instruction requires an artifact-by-artifact MET/MISSING citation so
+/// verdicts are grounded in the control's expected evidence rather than
+/// generic prose.
 async fn llm_evaluate(
     ctrl: &crate::regulatory_store::PciControl,
     control_id: &str,
     llm_evidence: &str,
 ) -> Result<SingleAuditResult, Box<dyn std::error::Error>> {
     let client = reqwest::Client::new();
+    let expected_artifacts = ctrl.required_artifacts.join("; ");
     let system_instruction = format!(
         "You are an accredited Qualified Security Assessor (QSA) evaluating evidence strictly against PCI DSS v4.0 Control [{}] ({}).\n\
         MANDATE: {}\n\
-        EXPECTED ARTIFACTS: {:?}\n\n\
+        EXPECTED ARTIFACTS - classify EVERY item below as MET, MISSING, or NOT_APPLICABLE based ONLY on the provided evidence:\n\
+        {}\n\n\
         INSTRUCTIONS:\n\
-        1. Compare the provided evidence exclusively against this control.\n\
-        2. Assign status: 'COMPLIANT', 'NON_COMPLIANT', or 'INSUFFICIENT'.\n\
-        3. If evidence is missing required details or is absent, mark 'NON_COMPLIANT' or 'INSUFFICIENT'.\n\
-        4. Provide an actionable technical remediation directive.\n\
-        5. Return raw JSON only: {{ \"control_id\": \"{}\", \"status\": \"...\", \"finding\": \"...\", \"remediation\": \"...\" }}",
-        ctrl.control_id, ctrl.title_en, ctrl.mandate_text, ctrl.required_artifacts, ctrl.control_id
+        1. Compare the evidence against every expected artifact above, one by one. Never invent content that is not present in the evidence.\n\
+        2. Assign status by these rules:\n\
+           - COMPLIANT: the evidence supplies every artifact needed to demonstrate this control.\n\
+           - NON_COMPLIANT: required artifacts are missing, so the control is not satisfied.\n\
+           - INSUFFICIENT: evidence is partial, unclear, or absent and no confident decision is possible.\n\
+        3. In met_artifacts list the expected artifacts the evidence satisfies; in missing_artifacts list the expected artifacts the evidence fails to supply. Use the exact artifact names from EXPECTED ARTIFACTS.\n\
+        4. finding: one short technical sentence explaining the verdict with real citations from the evidence. Do not repeat the MET/MISSING lists.\n\
+        5. remediation: the precise technical actions that would satisfy the missing artifacts.\n\
+        6. Return raw JSON only - no markdown fences, no extra text - with EXACTLY this schema:\n\
+        {{ \"control_id\": \"{}\", \"status\": \"COMPLIANT|NON_COMPLIANT|INSUFFICIENT\", \"finding\": \"...\", \"remediation\": \"...\", \"met_artifacts\": [\"...\"], \"missing_artifacts\": [\"...\"] }}",
+        ctrl.control_id, ctrl.title_en, ctrl.mandate_text, expected_artifacts, ctrl.control_id
     );
 
     let prompt = format!(
@@ -202,34 +286,42 @@ async fn llm_evaluate(
         .await?;
 
     let content = res["content"].as_str().unwrap_or("{}").trim().to_string();
-    let mut cleaned = content.clone();
-    if cleaned.starts_with("```json") {
-        cleaned = cleaned
-            .replace("```json", "")
-            .replace("```", "")
-            .trim()
-            .to_string();
-    } else if cleaned.starts_with("```") {
-        cleaned = cleaned.replace("```", "").trim().to_string();
-    }
 
-    let start_idx = cleaned.find('{').unwrap_or(0);
-    let end_idx = cleaned
-        .rfind('}')
-        .unwrap_or(cleaned.len().saturating_sub(1));
-    if start_idx <= end_idx {
-        cleaned = cleaned[start_idx..=end_idx].to_string();
-    }
+    let draft: AuditDraft = serde_json::from_str(&clean_llm_json(&content)).unwrap_or(AuditDraft {
+        control_id: control_id.to_string(),
+        status: String::new(),
+        finding: String::new(),
+        remediation: String::new(),
+        met_artifacts: Vec::new(),
+        missing_artifacts: Vec::new(),
+    });
 
-    let mut parsed: SingleAuditResult =
-        serde_json::from_str(&cleaned).unwrap_or_else(|_| SingleAuditResult {
-            control_id: control_id.to_string(),
-            status: "INSUFFICIENT".to_string(),
-            finding: "Failed to parse structured audit finding from inference output.".to_string(),
-            remediation: "Verify input evidence format and rerun evaluation.".to_string(),
-            evidence: llm_evidence.to_string(),
-        });
-    parsed.evidence = llm_evidence.to_string();
+    let status = normalize_status(&draft.status).unwrap_or("INSUFFICIENT");
+    let finding = compose_finding(
+        &draft.met_artifacts,
+        &draft.missing_artifacts,
+        &draft.finding,
+    );
+
+    let parsed = SingleAuditResult {
+        control_id: if draft.control_id.trim().is_empty() {
+            control_id.to_string()
+        } else {
+            draft.control_id
+        },
+        status: status.to_string(),
+        finding: if finding.trim().is_empty() {
+            "Failed to extract a structured finding from inference output.".to_string()
+        } else {
+            finding
+        },
+        remediation: if draft.remediation.trim().is_empty() {
+            "Verify input evidence format and rerun evaluation.".to_string()
+        } else {
+            draft.remediation
+        },
+        evidence: llm_evidence.to_string(),
+    };
     Ok(parsed)
 }
 
@@ -760,5 +852,64 @@ mod tests {
             "uploaded artifact"
         );
         assert_eq!(extract_artifact_name(""), "uploaded artifact");
+    }
+
+    #[test]
+    fn compose_finding_orders_met_then_missing_then_prose() {
+        let met = vec![
+            "Firewall policy export".to_string(),
+            "Network diagram".to_string(),
+        ];
+        let missing = vec!["Configuration review log".to_string()];
+        let out = compose_finding(&met, &missing, "Evidence demonstrates the control.");
+        assert_eq!(
+            out,
+            "MET: Firewall policy export, Network diagram. MISSING: Configuration review log. Evidence demonstrates the control."
+        );
+    }
+
+    #[test]
+    fn compose_finding_without_arrays_keeps_prose_only() {
+        let out = compose_finding(&[], &[], "  No artifact classification given.  ");
+        assert_eq!(out, "No artifact classification given.");
+        assert!(compose_finding(&[], &[], "   ").is_empty());
+    }
+
+    #[test]
+    fn clean_llm_json_strips_fences_and_stray_text() {
+        assert_eq!(
+            clean_llm_json("```json\n{\"status\":\"COMPLIANT\"}\n```"),
+            "{\"status\":\"COMPLIANT\"}"
+        );
+        assert_eq!(
+            clean_llm_json("Here is the result: {\"status\":\"NON_COMPLIANT\"} done."),
+            "{\"status\":\"NON_COMPLIANT\"}"
+        );
+        assert_eq!(clean_llm_json("\"escaped\":1"), "\"escaped\":1");
+    }
+
+    #[test]
+    fn normalize_status_accepts_only_valid_verdicts() {
+        assert_eq!(normalize_status("COMPLIANT"), Some("COMPLIANT"));
+        assert_eq!(normalize_status("  non_compliant  "), Some("NON_COMPLIANT"));
+        assert_eq!(normalize_status("Insufficient"), Some("INSUFFICIENT"));
+        assert_eq!(normalize_status("PASS"), None);
+        assert_eq!(normalize_status(""), None);
+    }
+
+    #[test]
+    fn audit_draft_parses_with_and_without_artifact_arrays() {
+        let full: AuditDraft = serde_json::from_str(
+            r#"{"control_id":"R1C1","status":"NON_COMPLIANT","finding":"x","remediation":"y",
+                "met_artifacts":["a"],"missing_artifacts":["b"]}"#,
+        )
+        .unwrap();
+        assert_eq!(full.met_artifacts, vec!["a"]);
+        assert_eq!(full.missing_artifacts, vec!["b"]);
+
+        let bare: AuditDraft =
+            serde_json::from_str(r#"{"status":"COMPLIANT","finding":"ok"}"#).unwrap();
+        assert!(bare.met_artifacts.is_empty());
+        assert!(bare.missing_artifacts.is_empty());
     }
 }
