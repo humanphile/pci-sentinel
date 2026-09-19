@@ -10,6 +10,7 @@ mod ocr;
 mod regulatory_store;
 mod server;
 
+use serde::Serialize;
 use server::{
     kill_stray_llama, restart_inference_server, start_inference_server, stop_inference_server,
 };
@@ -108,6 +109,55 @@ fn authenticate_user(
     }
 }
 
+/// Resolve the active session username, falling back to the seeded demo user
+/// (the same fallback used by the audit command).
+fn resolve_session_username(state: &tauri::State<'_, ActiveSession>) -> String {
+    let guard = state.username.lock().unwrap();
+    if guard.is_empty() {
+        "demo".to_string()
+    } else {
+        guard.clone()
+    }
+}
+
+/// Demo-trial usage for one requirement: which distinct controls the demo
+/// account has already verified in it. Mirrors the restriction SQL in
+/// `run_pci_control_audit` exactly, so the UI hint never lies to the trial
+/// user.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DemoRequirementUsage {
+    pub tested_controls: Vec<String>,
+    pub quota: u32,
+}
+
+#[tauri::command]
+async fn get_demo_requirement_usage(
+    requirement_number: Option<u32>,
+    state: tauri::State<'_, ActiveSession>,
+) -> Result<DemoRequirementUsage, String> {
+    let req_id = requirement_number.unwrap_or(1);
+    let username = resolve_session_username(&state);
+    let conn = db::get_connection().map_err(|e| e.to_string())?;
+
+    let mut hist_stmt = conn
+        .prepare(
+            "SELECT DISTINCT control_id FROM audit_records \
+             WHERE requirement_number = ?1 AND (username = ?2 OR username = '')",
+        )
+        .map_err(|e| e.to_string())?;
+
+    let tested_controls: Vec<String> = hist_stmt
+        .query_map(rusqlite::params![req_id, &username], |row| row.get(0))
+        .map(|iter| iter.flatten().collect())
+        .unwrap_or_default();
+
+    Ok(DemoRequirementUsage {
+        tested_controls,
+        quota: 1,
+    })
+}
+
 #[command]
 async fn run_pci_control_audit(
     evidence: String,
@@ -119,14 +169,7 @@ async fn run_pci_control_audit(
     let req_id = requirement_number.unwrap_or(1);
     let ctrl_id = control_id.ok_or("control_id missing")?;
 
-    let username = {
-        let guard = state.username.lock().unwrap();
-        if guard.is_empty() {
-            "demo".to_string()
-        } else {
-            guard.clone()
-        }
-    };
+    let username = resolve_session_username(&state);
 
     // Strict Database Role & Trial Enforcement
     {
@@ -406,6 +449,7 @@ pub fn run() {
             secure_shutdown,
             get_pci_requirement_controls,
             run_pci_control_audit,
+            get_demo_requirement_usage,
             export_single_control_dossier,
             export_pci_dossier,
             verify_pci_dossier,

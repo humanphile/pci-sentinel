@@ -93,6 +93,7 @@ export default function App() {
   const [lastExport, setLastExport] = useState<ExportResponse | null>(null);
   const [verificationValid, setVerificationValid] = useState<boolean | null>(null);
   const [history, setHistory] = useState<AuditRecord[]>([]);
+  const [demoUsage, setDemoUsage] = useState<{ tested_controls: string[]; quota: number } | null>(null);
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
@@ -274,7 +275,33 @@ export default function App() {
     }
   }, [isServerReady]);
 
+  // Demo-trial bookkeeping for the current requirement: mirrors the backend
+  // restriction SQL so the hint under the control picker stays truthful and
+  // updates immediately after each evaluation.
+  useEffect(() => {
+    if (!isServerReady || userRole !== "demo") {
+      setDemoUsage(null);
+      return;
+    }
+    invoke<{ tested_controls: string[]; quota: number }>("get_demo_requirement_usage", {
+      requirementNumber: selectedReqId,
+    })
+      .then(setDemoUsage)
+      .catch((err) => console.error("Failed to load demo usage:", err));
+  }, [isServerReady, userRole, selectedReqId, history]);
+
   const activeControl: PciControl | undefined = activeGroup?.controls[activeControlIndex];
+
+  // Demo-trial hint state for the control picker.
+  const demoTested = demoUsage?.tested_controls ?? [];
+  const demoSlotUsed = demoTested.length > 0;
+  const demoSlotUsedBySelection =
+    demoSlotUsed && activeControl ? demoTested.includes(activeControl.control_id) : false;
+  const demoHintText = !demoSlotUsed
+    ? `Demo trial: 1 of 1 control slot remaining for Requirement ${selectedReqId} — it can be verified only once.`
+    : demoSlotUsedBySelection
+    ? `Demo trial: control ${demoTested[0]} already verified — this requirement's 1 slot is used (no re-verification).`
+    : `Demo trial: slot used by ${demoTested[0]} — other controls in Requirement ${selectedReqId} require a subscription.`;
 
   const handleSelectControl = (index: number) => {
     if (!activeGroup || index < 0 || index >= activeGroup.controls.length) return;
@@ -787,6 +814,22 @@ export default function App() {
               </option>
             ))}
           </select>
+
+          {userRole === "demo" && (
+            <div
+              style={{
+                marginTop: "6px",
+                padding: "8px 10px",
+                borderRadius: "6px",
+                fontSize: "0.7rem",
+                background: demoSlotUsed ? "#3b0a0a" : "#082f49",
+                border: demoSlotUsed ? "1px solid #dc2626" : "1px solid #0284c7",
+                color: demoSlotUsed ? "#fca5a5" : "#7dd3fc",
+              }}
+            >
+              {demoHintText}
+            </div>
+          )}
 
           {activeControl && (
             <div 
