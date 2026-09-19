@@ -26,7 +26,7 @@ export function useLocalAI() {
       await waitForServerReady();
 
       setIsReady(true);
-      setStatusText('Local AI Ready (Qwen2.5-0.5B)');
+      setStatusText('Local AI Ready (Qwen2.5-3B)');
     } catch (err: any) {
       setError(typeof err === 'string' ? err : err.message || 'Initialization failed');
       setStatusText('Error');

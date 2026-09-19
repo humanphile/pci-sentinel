@@ -1,6 +1,6 @@
 //! Local image OCR via the Apple Vision framework (macOS only).
 //!
-//! The bundled Qwen 2.5 0.5B-instruct model is text-only and cannot see image
+//! The bundled Qwen 2.5 instruct model is text-only and cannot see image
 //! pixels. To let the local LLM genuinely evaluate image evidence, we OCR the
 //! image on-device with Vision and feed the extracted text into the audit
 //! prompt. On platforms without an OCR backend we report an honest result

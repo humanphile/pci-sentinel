@@ -72,7 +72,7 @@ pub async fn query_pci_single_control(
         .ok_or_else(|| format!("Control {} not found", control_id))?;
 
     // 1. OBJECTIVE ARTIFACT VALIDATION IN RUST
-    // The local Qwen 2.5 0.5B model is text-only: it cannot see image pixels.
+    // The local Qwen 2.5 model is text-only: it cannot see image pixels.
     // For image evidence we OCR the actual image payload on-device (Apple
     // Vision on macOS) and let the LLM evaluate the extracted text. When the
     // enclave cannot read the image content, we report an honest INSUFFICIENT

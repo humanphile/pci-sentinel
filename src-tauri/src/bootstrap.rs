@@ -6,7 +6,14 @@ use tauri::{AppHandle, Emitter, Manager};
 
 const HUGGINGFACE_USER: &str = "ahmadnan";
 const HUGGINGFACE_REPO: &str = "pci-sentinel-runtime";
-const MODEL_FILENAME: &str = "qwen2.5-0.5b-instruct-q4_k_m.gguf";
+
+/// Preferred inference model (Qwen 2.5-3B-Instruct Q4_K_M, ~2.1 GB). The 0.5B
+/// model was too small to reliably judge PCI DSS mandates vs. evidence.
+pub const MODEL_FILENAME: &str = "qwen2.5-3b-instruct-q4_k_m.gguf";
+
+/// Legacy model kept for graceful fallback until the new weights are uploaded
+/// to the runtime repo — the app still boots and audits on the old model.
+pub const LEGACY_MODEL_FILENAME: &str = "qwen2.5-0.5b-instruct-q4_k_m.gguf";
 
 #[tauri::command]
 pub async fn ensure_inference_runtime(app: AppHandle) -> Result<String, String> {
@@ -80,7 +87,7 @@ pub async fn ensure_inference_runtime(app: AppHandle) -> Result<String, String> 
     {
         let _ = app.emit(
             "bootstrap-progress",
-            "Downloading Qwen AI model weights (~500 MB)... Please wait.",
+            "Downloading Qwen AI model weights (~2.1 GB)... Please wait.",
         );
         let model_url = format!(
             "https://huggingface.co/{}/{}/resolve/main/{}",
@@ -117,7 +124,7 @@ async fn download_file(
         ));
     }
 
-    let total_size = response.content_length().unwrap_or(500_000_000);
+    let total_size = response.content_length().unwrap_or(2_100_000_000);
     let mut downloaded: u64 = 0;
     let mut file = File::create(dest).map_err(|e| format!("File create error: {}", e))?;
 
@@ -132,7 +139,7 @@ async fn download_file(
         let pct = ((downloaded as f64 / total_size as f64) * 100.0).min(100.0);
         let _ = app.emit(
             "bootstrap-progress",
-            format!("Downloading AI model weights: {:.1}% (~500MB)", pct),
+            format!("Downloading AI model weights: {:.1}% (~2.1GB)", pct),
         );
     }
 

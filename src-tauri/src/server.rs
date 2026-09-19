@@ -36,6 +36,8 @@ pub(crate) fn kill_stray_llama() {
 }
 
 fn spawn_inference_child(app: &AppHandle) -> Result<Child, String> {
+    use crate::bootstrap::{LEGACY_MODEL_FILENAME, MODEL_FILENAME};
+
     let app_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
     let is_windows = std::env::consts::OS == "windows";
     let binary_name = if is_windows {
@@ -44,12 +46,32 @@ fn spawn_inference_child(app: &AppHandle) -> Result<Child, String> {
         "llama-server"
     };
     let binary_path = app_dir.join("bin").join(binary_name);
-    let model_path = app_dir.join("qwen2.5-0.5b-instruct-q4_k_m.gguf");
 
-    if !binary_path.exists() || !model_path.exists() {
+    // Preferred model first; fall back to the legacy 0.5B weights so existing
+    // installs keep booting until the 3B file is uploaded to the runtime repo.
+    let preferred = app_dir.join(MODEL_FILENAME);
+    let legacy = app_dir.join(LEGACY_MODEL_FILENAME);
+    let (model_path, used_fallback) = if preferred.exists() {
+        (preferred, false)
+    } else if legacy.exists() {
+        (legacy, true)
+    } else {
+        return Err(format!(
+            "Runtime model missing: neither {} nor {} found. Run ensure_inference_runtime first.",
+            MODEL_FILENAME, LEGACY_MODEL_FILENAME
+        ));
+    };
+
+    if !binary_path.exists() {
         return Err("Runtime assets missing. Run ensure_inference_runtime first.".into());
     }
 
+    if used_fallback {
+        println!(
+            "⚠️  Using legacy {} model — {} not downloaded yet.",
+            LEGACY_MODEL_FILENAME, MODEL_FILENAME
+        );
+    }
     println!("Spawning llama-server from: {}", binary_path.display());
 
     Command::new(&binary_path)
