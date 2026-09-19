@@ -95,6 +95,7 @@ export default function App() {
   const [verificationValid, setVerificationValid] = useState<boolean | null>(null);
   const [history, setHistory] = useState<AuditRecord[]>([]);
   const [demoUsage, setDemoUsage] = useState<{ tested_controls: string[]; quota: number } | null>(null);
+  const [resetArmed, setResetArmed] = useState(false);
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
@@ -288,7 +289,10 @@ export default function App() {
       requirementNumber: selectedReqId,
     })
       .then(setDemoUsage)
-      .catch((err) => console.error("Failed to load demo usage:", err));
+      .catch((err) => {
+        console.error("Failed to load demo usage:", err);
+        setStatusMessage("⚠️ Demo trial status unavailable: " + String(err));
+      });
   }, [isServerReady, userRole, selectedReqId, history]);
 
   const activeControl: PciControl | undefined = activeGroup?.controls[activeControlIndex];
@@ -446,20 +450,29 @@ export default function App() {
     }
   };
 
-  const handleResetDemoTrial = async () => {
-    if (!window.confirm("Reset the demo trial? This clears the trial account's audit trail so every requirement slot becomes available again. Your subscription is unaffected.")) {
+  const handleResetDemoTrial = () => {
+    // Two-step in-app confirmation: window.confirm() is a silent no-op in the
+    // macOS Tauri webview, so a native dialog would make the button appear
+    // dead. First click arms the reset, second click executes it.
+    if (!resetArmed) {
+      setResetArmed(true);
+      setStatusMessage("⚠️ Click the button again to confirm clearing the trial slots.");
+      window.setTimeout(() => setResetArmed(false), 5000);
       return;
     }
-    try {
-      await invoke("reset_demo_trial");
-      setCompletedAudits({});
-      setCurrentResult(null);
-      setDemoUsage(null);
-      await loadHistory();
-      setStatusMessage("✓ Demo trial reset — all requirement slots are available again.");
-    } catch (err) {
-      setStatusMessage("Reset failed: " + String(err));
-    }
+    setResetArmed(false);
+    (async () => {
+      try {
+        await invoke("reset_demo_trial");
+        setCompletedAudits({});
+        setCurrentResult(null);
+        setDemoUsage(null);
+        await loadHistory();
+        setStatusMessage("✓ Demo trial reset — all requirement slots are available again.");
+      } catch (err) {
+        setStatusMessage("Reset failed: " + String(err));
+      }
+    })();
   };
 
   const handleFlushAndNextRequirement = async () => {
@@ -845,14 +858,14 @@ export default function App() {
                   marginTop: "8px",
                   padding: "4px 10px",
                   fontSize: "0.68rem",
-                  background: "#0f172a",
-                  color: "#7dd3fc",
-                  border: "1px solid #0284c7",
+                  background: resetArmed ? "#7f1d1d" : "#0f172a",
+                  color: resetArmed ? "#fecaca" : "#7dd3fc",
+                  border: resetArmed ? "1px solid #ef4444" : "1px solid #0284c7",
                   borderRadius: "4px",
                   cursor: "pointer",
                 }}
               >
-                ↺ Reset Demo Trial Slots
+                {resetArmed ? "⚠️ Confirm Reset Demo Trial?" : "↺ Reset Demo Trial Slots"}
               </button>
             </div>
           )}
