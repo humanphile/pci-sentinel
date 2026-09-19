@@ -30,3 +30,10 @@ rusqlite = { version = "0.32", features = ["bundled-sqlcipher-vendored-openssl"]
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
 rand = "0.8"
 directories = "6.0.0"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# Apple Vision OCR so the local LLM can genuinely evaluate image evidence
+# (text is extracted locally and fed to the text-only Qwen model).
+objc2 = "0.6"
+objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSArray", "NSData", "NSDictionary", "NSString", "NSError"] }
+objc2-vision = { version = "0.3", default-features = false, features = ["std", "VNDefines", "VNRequest", "VNRequestHandler", "VNRecognizeTextRequest", "VNObservation"] }

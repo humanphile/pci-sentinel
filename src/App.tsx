@@ -125,6 +125,9 @@ export default function App() {
   const [changePassError, setChangePassError] = useState<string | null>(null);
 
   const [showShutdownConfirmModal, setShowShutdownConfirmModal] = useState<boolean>(false);
+
+  const [imageEvidenceB64, setImageEvidenceB64] = useState<string | null>(null);
+  const [isFlushing, setIsFlushing] = useState<boolean>(false);
   
 // ====================================================================================
 
@@ -195,21 +198,26 @@ export default function App() {
     setBootAttempt((n) => n + 1);
   };
 
-  const loadRequirement = async (reqId: number) => {
+  const loadRequirement = async (reqId: number, hydrate: boolean = true) => {
     try {
+      setImageEvidenceB64(null);
       const res = await invoke<PciRequirementGroup | null>("get_pci_requirement_controls", {
         requirementNumber: reqId,
       });
 
       // Pull the persistent trail from the encrypted SQLite store so switching
-      // requirements never erases previously saved evaluations.
+      // requirements never erases previously saved evaluations — unless a
+      // "flush" was requested, in which case the wizard starts from a clean
+      // slate (the durable trail below stays intact in the database).
       let saved: Record<string, AuditResult> = {};
-      try {
-        const recs = await invoke<AuditRecord[]>("get_pci_audit_history");
-        setHistory(recs || []);
-        saved = hydrateCompletedFromHistory(recs || [], reqId);
-      } catch (err) {
-        console.error("Failed to load audit history:", err);
+      if (hydrate) {
+        try {
+          const recs = await invoke<AuditRecord[]>("get_pci_audit_history");
+          setHistory(recs || []);
+          saved = hydrateCompletedFromHistory(recs || [], reqId);
+        } catch (err) {
+          console.error("Failed to load audit history:", err);
+        }
       }
 
       setCompletedAudits(saved);
@@ -271,6 +279,7 @@ export default function App() {
   const handleSelectControl = (index: number) => {
     if (!activeGroup || index < 0 || index >= activeGroup.controls.length) return;
     setActiveControlIndex(index);
+    setImageEvidenceB64(null);
     const ctrl = activeGroup.controls[index];
     setEvidenceText(completedAudits[ctrl.control_id]?.evidence || ctrl.sample_evidence || "");
     setCurrentResult(completedAudits[ctrl.control_id] || null);
@@ -287,6 +296,8 @@ export default function App() {
       return;
     }
 
+    const IMAGE_EXTS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'heic'];
+
     const reader = new FileReader();
     const fileExt = file.name.split('.').pop()?.toLowerCase();
 
@@ -294,12 +305,26 @@ export default function App() {
       reader.onload = (event) => {
         const content = event.target?.result as string;
         setEvidenceText(`[Uploaded File: ${file.name}]\n\n${content}`);
+        setImageEvidenceB64(null);
         setStatusMessage(`✓ Loaded text file: ${file.name}`);
       };
       reader.readAsText(file);
+    } else if (IMAGE_EXTS.includes(fileExt || '')) {
+      // Images are captured as base64 payloads and OCR-scanned locally
+      // (Apple Vision on macOS) so the text-only local LLM can genuinely
+      // evaluate the image content instead of hallucinating about it.
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        const b64 = dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl;
+        setImageEvidenceB64(b64);
+        setEvidenceText(`[Uploaded Artifact File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]\nFile Type: ${file.type || fileExt}\n\n[Image payload captured. The enclave will OCR this image locally before the QSA evaluates its content.]`);
+        setStatusMessage(`✓ Image attached: ${file.name} — content will be OCR-scanned locally, then evaluated against the control mandate.`);
+      };
+      reader.readAsDataURL(file);
     } else {
       reader.onload = () => {
         setEvidenceText(`[Uploaded Artifact File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)]\nFile Type: ${file.type || fileExt}\n\n[Attached file payload successfully registered for audit evaluation.]`);
+        setImageEvidenceB64(null);
         setStatusMessage(`✓ Attached file artifact: ${file.name}`);
       };
       reader.readAsDataURL(file);
@@ -317,6 +342,7 @@ export default function App() {
         evidence: evidenceText,
         requirementNumber: selectedReqId,
         controlId: activeControl.control_id,
+        evidenceBinaryBase64: imageEvidenceB64 ?? undefined,
       });
 
       const enriched: AuditResult = { ...res, evidence: evidenceText };
@@ -401,8 +427,32 @@ export default function App() {
   const handleFlushAndNextRequirement = async () => {
     const currentId = selectedReqId;
     const nextId = currentId < 12 ? currentId + 1 : 1;
-    await loadRequirement(nextId);
-    setStatusMessage(`Requirement ${currentId} memory flushed. Loaded Requirement ${nextId}.`);
+
+    setIsFlushing(true);
+    setStatusMessage(`Flushing inference engine memory & loading Requirement ${nextId}...`);
+
+    // Kill and respawn llama-server with a fresh model context (releases any
+    // retained KV cache / conversation state), then start the next requirement
+    // with a clean wizard slate.
+    if (isTauri()) {
+      try {
+        await invoke("restart_inference_server");
+        setStatusMessage(`✓ Inference engine flushed and restarted fresh. Loading Requirement ${nextId}...`);
+      } catch (err) {
+        setStatusMessage(`⚠️ Flush warning: ${String(err)} (continuing to next requirement)`);
+      }
+    }
+
+    // Fresh knowledge base: clear the in-memory wizard state and load the next
+    // requirement WITHOUT re-hydrating the progress matrix from the trail. The
+    // durable trail in the encrypted database is intentionally left intact.
+    setCompletedAudits({});
+    setCurrentResult(null);
+    setLastExport(null);
+    setVerificationValid(null);
+    setImageEvidenceB64(null);
+    await loadRequirement(nextId, false);
+    setIsFlushing(false);
   };
 
   const handleResetKnowledgeBase = async () => {
@@ -419,6 +469,13 @@ export default function App() {
       setStatusMessage(`✓ ${res}`);
       setShowResetModal(false);
       setAdminPassword("");
+      // The sealed trail was wiped on the backend; reflect that in the wizard
+      // matrix and Trail view, and load the current requirement fresh.
+      setCompletedAudits({});
+      setCurrentResult(null);
+      setHistory([]);
+      setImageEvidenceB64(null);
+      await loadRequirement(selectedReqId, false);
     } catch (err) {
       setStatusMessage(`✗ Reset failed: ${err}`);
     } finally {
@@ -921,8 +978,9 @@ export default function App() {
                   className="btn-secondary"
                   style={{ width: "100%", marginTop: "6px", marginBottom: "6px" }}
                   onClick={handleFlushAndNextRequirement}
+                  disabled={isFlushing}
                 >
-                  🧹 Flush Memory & Next Requirement →
+                  {isFlushing ? "🔄 Flushing Memory..." : "🧹 Flush Memory & Next Requirement →"}
                 </button>
 
                 <button className="btn-verify" onClick={handleVerify} disabled={!lastExport}>
@@ -1043,6 +1101,10 @@ export default function App() {
                     borderRadius: "8px"
                   }}>
                     <label className="label" style={{ color: "#fca5a5", fontSize: "0.7rem" }}>Enter Admin Password</label>
+                    <div style={{ fontSize: "0.68rem", color: "#94a3b8", marginBottom: "8px", lineHeight: "1.4" }}>
+                      ⚠️ This permanently wipes the sealed audit trail and restarts the
+                      inference engine with a fresh model context. This cannot be undone.
+                    </div>
                     <input
                       type="password"
                       className="select-box"

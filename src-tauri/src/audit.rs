@@ -60,6 +60,7 @@ pub async fn query_pci_single_control(
     evidence: &str,
     requirement_id: u32,
     control_id: &str,
+    image_b64: Option<String>,
 ) -> Result<SingleAuditResult, Box<dyn std::error::Error>> {
     let req_group = regulatory_store::get_pci_requirement(requirement_id)
         .ok_or_else(|| format!("Requirement {} not loaded", requirement_id))?;
@@ -71,10 +72,14 @@ pub async fn query_pci_single_control(
         .ok_or_else(|| format!("Control {} not found", control_id))?;
 
     // 1. OBJECTIVE ARTIFACT VALIDATION IN RUST
-    // Since our local enclave runs a text-only LLM, raw image files, photos, or binary attachments
-    // cannot contain programmatic configuration text or network logs. We enforce strict compliance validation here.
+    // The local Qwen 2.5 0.5B model is text-only: it cannot see image pixels.
+    // For image evidence we OCR the actual image payload on-device (Apple
+    // Vision on macOS) and let the LLM evaluate the extracted text. When the
+    // enclave cannot read the image content, we report an honest INSUFFICIENT
+    // instead of hallucinating about the file.
     let ev_lower = evidence.to_lowercase();
-    let is_binary_or_image = ev_lower.contains("image/")
+    let is_image_evidence = image_b64.is_some()
+        || ev_lower.contains("image/")
         || ev_lower.contains("file type: image")
         || ev_lower.contains("uploaded artifact file")
         || ev_lower.ends_with(".png")
@@ -86,86 +91,27 @@ pub async fn query_pci_single_control(
         || ev_lower.contains(".jpg)")
         || ev_lower.contains(".jpeg)");
 
-    let result = if is_binary_or_image {
+    let is_binary_artifact = ev_lower.contains("file type: application/pdf")
+        || ev_lower.ends_with(".pdf")
+        || ev_lower.contains(".pdf)");
+
+    let result = if is_image_evidence {
+        evaluate_image_evidence(evidence, image_b64.as_deref(), ctrl, control_id).await?
+    } else if is_binary_artifact {
         SingleAuditResult {
             control_id: control_id.to_string(),
-            status: "NON_COMPLIANT".to_string(),
+            status: "INSUFFICIENT".to_string(),
             finding: format!(
-                "Enclave Artifact Validation Failure: The submitted evidence for control [{}] references a binary image or graphical file format. PCI DSS v4.0 technical controls require structured configuration dumps, command line output logs, or verifiable policy documentation. Graphic images do not constitute verifiable technical evidence.",
+                "Enclave Artifact Validation: The uploaded artifact '{}' is a binary PDF document that the local text-only assessor cannot scan. The enclave did not receive extractable text, so it cannot determine whether the document contains information relevant to control [{}].",
+                extract_artifact_name(evidence),
                 control_id
             ),
-            remediation: "Replace the image upload with valid plaintext configuration files, firewall rule exports, command logs, or signed policy documents.".to_string(),
+            remediation: "Export the PDF content as plain text (config dump, policy, or log lines) and paste it into the evidence box, then re-run the evaluation.".to_string(),
             evidence: evidence.to_string(),
         }
     } else {
         // 2. LLM Evaluation for valid text/document evidence
-        let client = reqwest::Client::new();
-        let system_instruction = format!(
-            "You are an accredited Qualified Security Assessor (QSA) evaluating evidence strictly against PCI DSS v4.0 Control [{}] ({}).\n\
-            MANDATE: {}\n\
-            EXPECTED ARTIFACTS: {:?}\n\n\
-            INSTRUCTIONS:\n\
-            1. Compare the provided evidence exclusively against this control.\n\
-            2. Assign status: 'COMPLIANT', 'NON_COMPLIANT', or 'INSUFFICIENT'.\n\
-            3. If evidence is missing required details or is absent, mark 'NON_COMPLIANT' or 'INSUFFICIENT'.\n\
-            4. Provide an actionable technical remediation directive.\n\
-            5. Return raw JSON only: {{ \"control_id\": \"{}\", \"status\": \"...\", \"finding\": \"...\", \"remediation\": \"...\" }}",
-            ctrl.control_id, ctrl.title_en, ctrl.mandate_text, ctrl.required_artifacts, ctrl.control_id
-        );
-
-        let prompt = format!(
-            "<|im_start|>system\n{}<|im_end|>\n<|im_start|>user\nAudit the following evidence:\n{}<|im_end|>\n<|im_start|>assistant\n",
-            system_instruction, evidence
-        );
-
-        let res = client
-            .post("http://127.0.0.1:8090/completion")
-            .header(
-                "Authorization",
-                format!("Bearer {}", INTERNAL_ENCLAVE_TOKEN),
-            )
-            .json(&json!({
-                "prompt": prompt,
-                "temperature": 0.0,
-                "n_predict": 1024,
-                "stop": ["<|im_end|>"]
-            }))
-            .send()
-            .await?
-            .json::<serde_json::Value>()
-            .await?;
-
-        let content = res["content"].as_str().unwrap_or("{}").trim().to_string();
-        let mut cleaned = content.clone();
-        if cleaned.starts_with("```json") {
-            cleaned = cleaned
-                .replace("```json", "")
-                .replace("```", "")
-                .trim()
-                .to_string();
-        } else if cleaned.starts_with("```") {
-            cleaned = cleaned.replace("```", "").trim().to_string();
-        }
-
-        let start_idx = cleaned.find('{').unwrap_or(0);
-        let end_idx = cleaned
-            .rfind('}')
-            .unwrap_or(cleaned.len().saturating_sub(1));
-        if start_idx <= end_idx {
-            cleaned = cleaned[start_idx..=end_idx].to_string();
-        }
-
-        let mut parsed: SingleAuditResult =
-            serde_json::from_str(&cleaned).unwrap_or_else(|_| SingleAuditResult {
-                control_id: control_id.to_string(),
-                status: "INSUFFICIENT".to_string(),
-                finding: "Failed to parse structured audit finding from inference output."
-                    .to_string(),
-                remediation: "Verify input evidence format and rerun evaluation.".to_string(),
-                evidence: evidence.to_string(),
-            });
-        parsed.evidence = evidence.to_string();
-        parsed
+        llm_evaluate(ctrl, control_id, evidence).await?
     };
 
     // 3. PERSIST AUDIT RECORD TO SQLCIPHER
@@ -191,6 +137,147 @@ pub async fn query_pci_single_control(
     }
 
     Ok(result)
+}
+
+/// Best-effort extraction of the uploaded file name from the evidence stub
+/// text (e.g. "[Uploaded Artifact File: scan.png (32.1 KB)]").
+fn extract_artifact_name(evidence: &str) -> String {
+    let lower = evidence.to_lowercase();
+    for marker in ["artifact file:", "uploaded file:", "file: "] {
+        if let Some(pos) = lower.find(marker) {
+            let rest = &evidence[pos + marker.len()..];
+            let name: String = rest
+                .chars()
+                .take_while(|c| *c != '(' && *c != '\n' && *c != ']' && *c != '[' && *c != ',')
+                .collect();
+            let name = name.trim();
+            if !name.is_empty() {
+                return name.to_string();
+            }
+        }
+    }
+    "uploaded artifact".to_string()
+}
+
+/// Evaluate free-text evidence against a control with the local LLM.
+async fn llm_evaluate(
+    ctrl: &crate::regulatory_store::PciControl,
+    control_id: &str,
+    llm_evidence: &str,
+) -> Result<SingleAuditResult, Box<dyn std::error::Error>> {
+    let client = reqwest::Client::new();
+    let system_instruction = format!(
+        "You are an accredited Qualified Security Assessor (QSA) evaluating evidence strictly against PCI DSS v4.0 Control [{}] ({}).\n\
+        MANDATE: {}\n\
+        EXPECTED ARTIFACTS: {:?}\n\n\
+        INSTRUCTIONS:\n\
+        1. Compare the provided evidence exclusively against this control.\n\
+        2. Assign status: 'COMPLIANT', 'NON_COMPLIANT', or 'INSUFFICIENT'.\n\
+        3. If evidence is missing required details or is absent, mark 'NON_COMPLIANT' or 'INSUFFICIENT'.\n\
+        4. Provide an actionable technical remediation directive.\n\
+        5. Return raw JSON only: {{ \"control_id\": \"{}\", \"status\": \"...\", \"finding\": \"...\", \"remediation\": \"...\" }}",
+        ctrl.control_id, ctrl.title_en, ctrl.mandate_text, ctrl.required_artifacts, ctrl.control_id
+    );
+
+    let prompt = format!(
+        "<|im_start|>system\n{}<|im_end|>\n<|im_start|>user\nAudit the following evidence:\n{}<|im_end|>\n<|im_start|>assistant\n",
+        system_instruction, llm_evidence
+    );
+
+    let res = client
+        .post("http://127.0.0.1:8090/completion")
+        .header(
+            "Authorization",
+            format!("Bearer {}", INTERNAL_ENCLAVE_TOKEN),
+        )
+        .json(&json!({
+            "prompt": prompt,
+            "temperature": 0.0,
+            "n_predict": 1024,
+            "stop": ["<|im_end|>"]
+        }))
+        .send()
+        .await?
+        .json::<serde_json::Value>()
+        .await?;
+
+    let content = res["content"].as_str().unwrap_or("{}").trim().to_string();
+    let mut cleaned = content.clone();
+    if cleaned.starts_with("```json") {
+        cleaned = cleaned
+            .replace("```json", "")
+            .replace("```", "")
+            .trim()
+            .to_string();
+    } else if cleaned.starts_with("```") {
+        cleaned = cleaned.replace("```", "").trim().to_string();
+    }
+
+    let start_idx = cleaned.find('{').unwrap_or(0);
+    let end_idx = cleaned
+        .rfind('}')
+        .unwrap_or(cleaned.len().saturating_sub(1));
+    if start_idx <= end_idx {
+        cleaned = cleaned[start_idx..=end_idx].to_string();
+    }
+
+    let mut parsed: SingleAuditResult =
+        serde_json::from_str(&cleaned).unwrap_or_else(|_| SingleAuditResult {
+            control_id: control_id.to_string(),
+            status: "INSUFFICIENT".to_string(),
+            finding: "Failed to parse structured audit finding from inference output.".to_string(),
+            remediation: "Verify input evidence format and rerun evaluation.".to_string(),
+            evidence: llm_evidence.to_string(),
+        });
+    parsed.evidence = llm_evidence.to_string();
+    Ok(parsed)
+}
+
+/// Evaluate image evidence: OCR the actual image payload on-device (when the
+/// enclave received it), then let the LLM judge whether the extracted text is
+/// relevant to the control — and if so, whether it is compliant.
+async fn evaluate_image_evidence(
+    evidence: &str,
+    image_b64: Option<&str>,
+    ctrl: &crate::regulatory_store::PciControl,
+    control_id: &str,
+) -> Result<SingleAuditResult, Box<dyn std::error::Error>> {
+    let artifact_name = extract_artifact_name(evidence);
+
+    match image_b64 {
+        Some(payload) => match crate::ocr::extract_text_from_image_base64(payload) {
+            Ok(ocr_text) => {
+                let llm_evidence = format!(
+                    "[Uploaded image artifact: {}]\n\
+                    The enclave performed local OCR on the image and extracted the following text:\n\
+                    <BEGIN OCR>\n{}\n<END OCR>\n\n\
+                    Assess ONLY the OCR-extracted text against the control mandate. If the extracted text is empty, garbled, or irrelevant to this control, mark 'INSUFFICIENT'. If it contains configuration, policy, or log content relevant to this control, judge compliance from it. Never infer content that is not present in the OCR text.",
+                    artifact_name, ocr_text
+                );
+                llm_evaluate(ctrl, control_id, &llm_evidence).await
+            }
+            Err(ocr_err) => Ok(SingleAuditResult {
+                control_id: control_id.to_string(),
+                status: "INSUFFICIENT".to_string(),
+                finding: format!(
+                    "Image Review Failed: The enclave attempted to extract machine-readable text from '{}', but could not: {}. Because the local QSA model is text-only, it cannot review image content it cannot read, so it cannot determine whether the image contains information relevant to control [{}].",
+                    artifact_name, ocr_err, control_id
+                ),
+                remediation: "Attach a clearer image with visible text/numbers, or upload the underlying text artifact (config export, policy, or logs) so the enclave can evaluate the actual content.".to_string(),
+                evidence: evidence.to_string(),
+            }),
+        },
+        None => Ok(SingleAuditResult {
+            control_id: control_id.to_string(),
+            status: "INSUFFICIENT".to_string(),
+            finding: format!(
+                "Image Review Failed: The submitted evidence references image file '{}', but the enclave did not receive the image payload needed to scan its content. Without reading the image, the assessor cannot determine whether it contains information relevant to control [{}].",
+                artifact_name, control_id
+            ),
+            remediation: "Use the 'Browse...' button to upload the actual image file so the enclave can OCR and evaluate it. Do not describe image files in plain text.".to_string(),
+            evidence: evidence.to_string(),
+        }),
+    }
 }
 
 fn get_app_dir() -> PathBuf {
@@ -658,5 +745,20 @@ mod tests {
         assert!(!out.contains('\\'));
         // ASCII characters including the unicode '✓' replacement are filtered:
         assert!(out.is_ascii());
+    }
+
+    #[test]
+    fn extract_artifact_name_parses_upload_stub() {
+        let ev = "[Uploaded Artifact File: scan-12-08-2026.png (32.1 KB)]\nFile Type: image/png";
+        assert_eq!(extract_artifact_name(ev), "scan-12-08-2026.png");
+    }
+
+    #[test]
+    fn extract_artifact_name_falls_back_when_unparseable() {
+        assert_eq!(
+            extract_artifact_name("plain pasted text"),
+            "uploaded artifact"
+        );
+        assert_eq!(extract_artifact_name(""), "uploaded artifact");
     }
 }

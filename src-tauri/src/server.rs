@@ -15,16 +15,27 @@ impl Drop for ServerProcess {
     }
 }
 
-#[tauri::command]
-pub async fn start_inference_server(
-    app: AppHandle,
-    state: State<'_, ServerProcess>,
-) -> Result<u16, String> {
-    let mut guard = state.0.lock().map_err(|e| e.to_string())?;
-    if guard.is_some() {
-        return Ok(8090);
-    }
+/// Purge any stray llama-server processes (e.g., orphans from a crashed run).
+/// Kept coarse and blunt on purpose: the guarantee that only one inference
+/// engine ever survives is more important than surgical precision.
+pub(crate) fn kill_stray_llama() {
+    #[cfg(target_os = "macos")]
+    let _ = Command::new("sh")
+        .arg("-c")
+        .arg("pkill -9 llama-server || true")
+        .status();
+    #[cfg(target_os = "windows")]
+    let _ = Command::new("taskkill")
+        .args(["/F", "/IM", "llama-server.exe"])
+        .status();
+    #[cfg(target_os = "linux")]
+    let _ = Command::new("sh")
+        .arg("-c")
+        .arg("pkill -9 llama-server || true")
+        .status();
+}
 
+fn spawn_inference_child(app: &AppHandle) -> Result<Child, String> {
     let app_dir = app.path().app_data_dir().map_err(|e| e.to_string())?;
     let is_windows = std::env::consts::OS == "windows";
     let binary_name = if is_windows {
@@ -41,7 +52,7 @@ pub async fn start_inference_server(
 
     println!("Spawning llama-server from: {}", binary_path.display());
 
-    let child = Command::new(&binary_path)
+    Command::new(&binary_path)
         .arg("-m")
         .arg(&model_path)
         .arg("--port")
@@ -53,9 +64,63 @@ pub async fn start_inference_server(
         .stdout(Stdio::inherit()) // Pipe server logs directly to your terminal
         .stderr(Stdio::inherit()) // Pipe server errors directly to your terminal
         .spawn()
-        .map_err(|e| format!("Failed to spawn llama-server: {}", e))?;
+        .map_err(|e| format!("Failed to spawn llama-server: {}", e))
+}
 
+#[tauri::command]
+pub async fn start_inference_server(
+    app: AppHandle,
+    state: State<'_, ServerProcess>,
+) -> Result<u16, String> {
+    let mut guard = state.0.lock().map_err(|e| e.to_string())?;
+    if guard.is_some() {
+        return Ok(8090);
+    }
+
+    let child = spawn_inference_child(&app)?;
     *guard = Some(child);
+    Ok(8090)
+}
+
+/// Wait until llama-server answers /health, up to `timeout_secs`.
+async fn wait_until_healthy(timeout_secs: u64) -> Result<(), String> {
+    let client = reqwest::Client::new();
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(timeout_secs);
+    while std::time::Instant::now() < deadline {
+        match client.get("http://127.0.0.1:8090/health").send().await {
+            Ok(res) if res.status().is_success() => return Ok(()),
+            _ => tokio::time::sleep(std::time::Duration::from_millis(500)).await,
+        }
+    }
+    Err("Timed out waiting for the inference engine to become healthy after restart.".into())
+}
+
+/// Kill the current inference engine process and spawn a fresh one, then wait
+/// until it answers /health. This truly "flushes" the LLM's retained context /
+/// KV cache so the next audit starts from a clean knowledge base.
+#[tauri::command]
+pub async fn restart_inference_server(
+    app: AppHandle,
+    state: State<'_, ServerProcess>,
+) -> Result<u16, String> {
+    {
+        let mut guard = state.0.lock().map_err(|e| e.to_string())?;
+        if let Some(mut child) = guard.take() {
+            let _ = child.kill();
+            let _ = child.wait();
+        }
+    }
+
+    // Purge any strays so the port is guaranteed free before the respawn.
+    kill_stray_llama();
+
+    let child = spawn_inference_child(&app)?;
+    {
+        let mut guard = state.0.lock().map_err(|e| e.to_string())?;
+        *guard = Some(child);
+    }
+
+    wait_until_healthy(20).await?;
     Ok(8090)
 }
 

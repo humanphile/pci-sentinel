@@ -6,10 +6,13 @@ pub mod licensing;
 mod audit;
 mod bootstrap;
 mod db;
+mod ocr;
 mod regulatory_store;
 mod server;
 
-use server::{start_inference_server, stop_inference_server};
+use server::{
+    kill_stray_llama, restart_inference_server, start_inference_server, stop_inference_server,
+};
 use std::process::Command;
 use std::sync::{Arc, Mutex};
 use tauri::{command, Emitter, Manager, RunEvent};
@@ -18,24 +21,6 @@ use tauri::{command, Emitter, Manager, RunEvent};
 #[derive(Default, Clone)]
 struct ActiveSession {
     username: Arc<Mutex<String>>,
-}
-
-/// Purge any stray llama-server processes (e.g., orphans from a crashed run).
-fn kill_stray_llama() {
-    #[cfg(target_os = "macos")]
-    let _ = Command::new("sh")
-        .arg("-c")
-        .arg("pkill -9 llama-server || true")
-        .status();
-    #[cfg(target_os = "windows")]
-    let _ = Command::new("taskkill")
-        .args(["/F", "/IM", "llama-server.exe"])
-        .status();
-    #[cfg(target_os = "linux")]
-    let _ = Command::new("sh")
-        .arg("-c")
-        .arg("pkill -9 llama-server || true")
-        .status();
 }
 
 #[command]
@@ -128,6 +113,7 @@ async fn run_pci_control_audit(
     evidence: String,
     requirement_number: Option<u32>,
     control_id: Option<String>,
+    evidence_binary_base64: Option<String>,
     state: tauri::State<'_, ActiveSession>,
 ) -> Result<audit::SingleAuditResult, String> {
     let req_id = requirement_number.unwrap_or(1);
@@ -181,9 +167,15 @@ async fn run_pci_control_audit(
         }
     }
 
-    audit::query_pci_single_control(&username, &evidence, req_id, &ctrl_id)
-        .await
-        .map_err(|e| e.to_string())
+    audit::query_pci_single_control(
+        &username,
+        &evidence,
+        req_id,
+        &ctrl_id,
+        evidence_binary_base64,
+    )
+    .await
+    .map_err(|e| e.to_string())
 }
 
 #[command]
@@ -244,37 +236,62 @@ fn open_pdf_file(file_path: Option<String>) -> Result<(), String> {
 }
 
 #[command]
-fn reset_llama_knowledge_base(password: String) -> Result<String, String> {
-    let conn = db::get_connection().map_err(|e| e.to_string())?;
-
+async fn reset_llama_knowledge_base(
+    password: String,
+    app: tauri::AppHandle,
+) -> Result<String, String> {
     let hwid = licensing::get_machine_hardware_id();
 
-    let mut stmt = conn
-        .prepare("SELECT value FROM enclave_meta WHERE key = 'admin_reset_pass'")
-        .map_err(|e| e.to_string())?;
+    {
+        let conn = db::get_connection().map_err(|e| e.to_string())?;
 
-    let expected_pass = match stmt.query_row([], |row| row.get::<_, String>(0)) {
-        Ok(p) => p,
-        Err(_) => {
-            // Derived from the same formula as the sentinel-licenser CLI. The
-            // derived value is persisted so both sides stay in lock-step.
-            let short_pass = licensing::admin_reset_password(&hwid);
-
-            conn.execute(
-                "INSERT OR REPLACE INTO enclave_meta (key, value) VALUES ('admin_reset_pass', ?)",
-                [short_pass.clone()],
-            )
+        let mut stmt = conn
+            .prepare("SELECT value FROM enclave_meta WHERE key = 'admin_reset_pass'")
             .map_err(|e| e.to_string())?;
 
-            short_pass
-        }
-    };
+        let found = match stmt.query_row([], |row| row.get::<_, String>(0)) {
+            Ok(p) => p,
+            Err(_) => {
+                // Derived from the same formula as the sentinel-licenser CLI.
+                // The derived value is persisted so both sides stay in
+                // lock-step. `stmt` is still alive here (shared borrow), which
+                // is fine — `Connection::execute` only needs `&self`.
+                let short_pass = licensing::admin_reset_password(&hwid);
 
-    if password != expected_pass {
-        return Err("Unauthorized: Incorrect hardware-bound admin password.".into());
+                conn.execute(
+                    "INSERT OR REPLACE INTO enclave_meta (key, value) VALUES ('admin_reset_pass', ?)",
+                    [short_pass.clone()],
+                )
+                .map_err(|e| e.to_string())?;
+
+                short_pass
+            }
+        };
+        drop(stmt);
+
+        if password != found {
+            return Err("Unauthorized: Incorrect hardware-bound admin password.".into());
+        }
+
+        // This is a full knowledge-base reset: wipe the sealed audit trail so
+        // the wizard starts from a truly clean slate, then reload the
+        // inference engine with a fresh model context (releasing any retained
+        // KV cache state). The connection is dropped here so it never crosses
+        // the `.await` below.
+        conn.execute("DELETE FROM audit_records", [])
+            .map_err(|e| format!("Failed to wipe audit trail: {}", e))?;
     }
 
-    Ok("Llama knowledge base successfully reset via hardware-bound authorization.".into())
+    match restart_inference_server(app.clone(), app.state()).await {
+        Ok(_) => Ok(
+            "Knowledge base reset: sealed audit trail wiped and inference engine restarted with a fresh model context."
+                .into(),
+        ),
+        Err(e) => Ok(format!(
+            "Audit trail wiped. Warning: inference engine restart reported: {}",
+            e
+        )),
+    }
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -375,6 +392,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             bootstrap::ensure_inference_runtime,
             start_inference_server,
+            restart_inference_server,
             stop_inference_server,
             secure_shutdown,
             get_pci_requirement_controls,
