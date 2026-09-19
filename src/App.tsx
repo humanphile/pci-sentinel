@@ -54,6 +54,7 @@ interface AuditRecord {
   status: string;
   summary: string;
   evidence_hash: string;
+  evidence_text?: string;
   username: string;
 }
 
@@ -261,7 +262,7 @@ export default function App() {
           status: rec.status,
           finding: rec.summary,
           remediation: "",
-          evidence: "",
+          evidence: rec.evidence_text || "",
         };
       }
     }
@@ -413,13 +414,7 @@ export default function App() {
   };
 
   const handleExportConsolidated = async () => {
-	if (userRole === "demo") {
-    setStatusMessage("⚠️ Demo Limitation: Consolidated master dossier export requires an enterprise subscription key.");
-    setShowActivationModal(true);
-    return;
-  }   
-
- if (!activeGroup || Object.keys(completedAudits).length === 0) {
+    if (!activeGroup || Object.keys(completedAudits).length === 0) {
       setStatusMessage("Evaluate at least one control before consolidating.");
       return;
     }
@@ -448,6 +443,22 @@ export default function App() {
       setStatusMessage(`✓ Consolidated Multi-Page Master Dossier Sealed (#${res.record_id})`);
     } catch (err) {
       setStatusMessage("Consolidated export failure: " + String(err));
+    }
+  };
+
+  const handleResetDemoTrial = async () => {
+    if (!window.confirm("Reset the demo trial? This clears the trial account's audit trail so every requirement slot becomes available again. Your subscription is unaffected.")) {
+      return;
+    }
+    try {
+      await invoke("reset_demo_trial");
+      setCompletedAudits({});
+      setCurrentResult(null);
+      setDemoUsage(null);
+      await loadHistory();
+      setStatusMessage("✓ Demo trial reset — all requirement slots are available again.");
+    } catch (err) {
+      setStatusMessage("Reset failed: " + String(err));
     }
   };
 
@@ -827,7 +838,22 @@ export default function App() {
                 color: demoSlotUsed ? "#fca5a5" : "#7dd3fc",
               }}
             >
-              {demoHintText}
+              <div>{demoHintText}</div>
+              <button
+                onClick={handleResetDemoTrial}
+                style={{
+                  marginTop: "8px",
+                  padding: "4px 10px",
+                  fontSize: "0.68rem",
+                  background: "#0f172a",
+                  color: "#7dd3fc",
+                  border: "1px solid #0284c7",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                ↺ Reset Demo Trial Slots
+              </button>
             </div>
           )}
 

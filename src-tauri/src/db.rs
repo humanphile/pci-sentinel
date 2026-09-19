@@ -139,6 +139,22 @@ pub fn init_database() -> Result<(), rusqlite::Error> {
         }
     }
 
+    // Migration: persist the full evidence text alongside its hash so sealed
+    // reports/dossiers can reproduce what was actually evaluated, not just a
+    // digest.
+    {
+        let mut check = conn.prepare(
+            "SELECT COUNT(*) FROM pragma_table_info('audit_records') WHERE name = 'evidence_text'",
+        )?;
+        let exists: i64 = check.query_row([], |row| row.get(0))?;
+        if exists == 0 {
+            conn.execute(
+                "ALTER TABLE audit_records ADD COLUMN evidence_text TEXT NOT NULL DEFAULT ''",
+                [],
+            )?;
+        }
+    }
+
     // Seed default users if table is empty (properly inside the function body)
     let mut stmt = conn.prepare("SELECT COUNT(*) FROM users")?;
     let count: i64 = stmt.query_row([], |row| row.get(0))?;
@@ -171,6 +187,7 @@ pub struct AuditRecord {
     pub status: String,
     pub summary: String,
     pub evidence_hash: String,
+    pub evidence_text: String,
     pub username: String,
 }
 
@@ -185,6 +202,7 @@ pub struct AuditInsert<'a> {
     pub status: &'a str,
     pub summary: &'a str,
     pub evidence_hash: &'a str,
+    pub evidence_text: &'a str,
     pub requirement_number: u32,
 }
 
@@ -192,7 +210,7 @@ pub fn insert_audit_record(record: &AuditInsert) -> Result<i64, String> {
     let conn = get_connection().map_err(|e| e.to_string())?;
 
     conn.execute(
-        "INSERT INTO audit_records (timestamp, control_id, requirement_number, status, summary, evidence_hash, username) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO audit_records (timestamp, control_id, requirement_number, status, summary, evidence_hash, evidence_text, username) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         rusqlite::params![
             record.timestamp,
             record.control_id,
@@ -200,6 +218,7 @@ pub fn insert_audit_record(record: &AuditInsert) -> Result<i64, String> {
             record.status,
             record.summary,
             record.evidence_hash,
+            record.evidence_text,
             record.username,
         ],
     ).map_err(|e| e.to_string())?;
@@ -220,7 +239,7 @@ pub fn fetch_audit_history() -> Result<Vec<AuditRecord>, String> {
     }
 
     let mut stmt = conn.prepare(
-        "SELECT id, timestamp, control_id, requirement_number, status, summary, evidence_hash, username \
+        "SELECT id, timestamp, control_id, requirement_number, status, summary, evidence_hash, evidence_text, username \
          FROM audit_records ORDER BY id DESC"
     ).map_err(|e| e.to_string())?;
 
@@ -234,7 +253,8 @@ pub fn fetch_audit_history() -> Result<Vec<AuditRecord>, String> {
                 status: row.get(4)?,
                 summary: row.get(5)?,
                 evidence_hash: row.get(6)?,
-                username: row.get(7)?,
+                evidence_text: row.get(7)?,
+                username: row.get(8)?,
             })
         })
         .map_err(|e| e.to_string())?;

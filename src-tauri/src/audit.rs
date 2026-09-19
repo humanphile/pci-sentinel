@@ -128,6 +128,7 @@ pub async fn query_pci_single_control(
         status: &result.status,
         summary: &result.finding,
         evidence_hash: &evidence_hash,
+        evidence_text: evidence,
         requirement_number: requirement_id,
     }) {
         eprintln!(

@@ -231,6 +231,27 @@ async fn run_pci_control_audit(
 }
 
 #[command]
+fn reset_demo_trial(state: tauri::State<'_, ActiveSession>) -> Result<(), String> {
+    // Trial reset is deliberately scoped to the demo account: it clears the
+    // audit trail rows that the demo restriction counts (the demo user's own
+    // records plus legacy unattributed ones), so every requirement slot is
+    // available again. Subscriber/enterprise trails are left untouched.
+    let username = resolve_session_username(&state);
+    if username != "demo" {
+        return Err("Reset Demo Trial is only available for trial accounts.".into());
+    }
+
+    let conn = db::get_connection().map_err(|e| e.to_string())?;
+    conn.execute(
+        "DELETE FROM audit_records WHERE username = 'demo' OR username = ''",
+        [],
+    )
+    .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[command]
 fn secure_shutdown() -> Result<(), String> {
     kill_stray_llama();
     std::process::exit(0);
@@ -454,6 +475,7 @@ pub fn run() {
             export_pci_dossier,
             verify_pci_dossier,
             get_pci_audit_history,
+            reset_demo_trial,
             open_pdf_file,
             reset_llama_knowledge_base,
             authenticate_user,
