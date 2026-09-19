@@ -140,10 +140,11 @@ async fn run_pci_control_audit(
             .unwrap_or_else(|_| "demo".to_string());
 
         if user_role == "demo" {
-            // Check distinct controls already evaluated by THIS user for THIS
-            // specific requirement number. Legacy records without an owner
-            // (pre-attribution databases) are conservatively attributed so the
-            // demo limitation cannot be bypassed by data written earlier.
+            // Strict trial rule: per requirement, a demo account may evaluate
+            // exactly ONE distinct control, and that control only ONCE. Legacy
+            // records without an owner (pre-attribution databases) are
+            // conservatively attributed so the limitation cannot be bypassed
+            // by data written earlier.
             let mut hist_stmt = conn
                 .prepare(
                     "SELECT DISTINCT control_id FROM audit_records \
@@ -156,8 +157,16 @@ async fn run_pci_control_audit(
                 .map(|iter| iter.flatten().collect());
 
             if let Ok(controls) = tested_controls {
-                // If a control was already evaluated for this requirement, and the user is trying a DIFFERENT control ID
-                if !controls.is_empty() && !controls.contains(&ctrl_id) {
+                // 1) This control was already evaluated: block the retest too.
+                if controls.contains(&ctrl_id) {
+                    return Err(format!(
+                        "Demo Limitation: Control '{}' for Requirement {} was already evaluated with the trial account. Trial accounts may evaluate each control only once. Please activate your subscription license to re-evaluate.",
+                        ctrl_id, req_id
+                    ));
+                }
+                // 2) A different control is being tried, but this requirement's
+                //    single trial slot is already consumed.
+                if !controls.is_empty() {
                     return Err(format!(
                         "Demo Limitation: Trial accounts are restricted to evaluating only 1 control per requirement. You have already evaluated control '{}' for Requirement {}. Please activate your subscription license to test additional controls.",
                         controls[0], req_id
