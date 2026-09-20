@@ -231,24 +231,29 @@ async fn run_pci_control_audit(
 }
 
 #[command]
-fn reset_demo_trial(state: tauri::State<'_, ActiveSession>) -> Result<(), String> {
-    // Trial reset is deliberately scoped to the demo account: it clears the
-    // audit trail rows that the demo restriction counts (the demo user's own
-    // records plus legacy unattributed ones), so every requirement slot is
-    // available again. Subscriber/enterprise trails are left untouched.
-    let username = resolve_session_username(&state);
-    if username != "demo" {
-        return Err("Reset Demo Trial is only available for trial accounts.".into());
-    }
+fn get_runtime_model_status(app: tauri::AppHandle) -> Result<RuntimeModelStatus, String> {
+    let profile = server::collect_hardware_profile();
+    let choice = server::choose_runtime_model(&app)?;
+    Ok(RuntimeModelStatus {
+        model: choice.model_name,
+        reason: choice.reason.to_string(),
+        sufficient: choice.reason == "ok",
+        ram_gb: profile.total_ram_bytes / (1024 * 1024 * 1024),
+        cores: profile.physical_cores,
+        message: choice.message,
+    })
+}
 
-    let conn = db::get_connection().map_err(|e| e.to_string())?;
-    conn.execute(
-        "DELETE FROM audit_records WHERE username = 'demo' OR username = ''",
-        [],
-    )
-    .map_err(|e| e.to_string())?;
-
-    Ok(())
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RuntimeModelStatus {
+    pub model: String,
+    /// `"ok"` | `"hardware"` | `"missing"`
+    pub reason: String,
+    pub sufficient: bool,
+    pub ram_gb: u64,
+    pub cores: u32,
+    pub message: String,
 }
 
 #[command]
@@ -471,11 +476,11 @@ pub fn run() {
             get_pci_requirement_controls,
             run_pci_control_audit,
             get_demo_requirement_usage,
+            get_runtime_model_status,
             export_single_control_dossier,
             export_pci_dossier,
             verify_pci_dossier,
             get_pci_audit_history,
-            reset_demo_trial,
             open_pdf_file,
             reset_llama_knowledge_base,
             authenticate_user,

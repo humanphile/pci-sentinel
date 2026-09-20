@@ -30,6 +30,7 @@ rusqlite = { version = "0.32", features = ["bundled-sqlcipher-vendored-openssl"]
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
 rand = "0.8"
 directories = "6.0.0"
+sysinfo = "0.33"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 # Apple Vision OCR so the local LLM can genuinely evaluate image evidence

@@ -79,12 +79,21 @@ pub async fn ensure_inference_runtime(app: AppHandle) -> Result<String, String> 
             .status();
     }
 
-    // 3. Check/Download Qwen model weights if missing
-    if !model_path.exists()
+    // 3. Check/Download Qwen model weights, gated on hardware capability
+    let hw = crate::server::collect_hardware_profile();
+    let hw_capable = crate::server::model_capable(&hw, crate::server::QWEN_3B_NOMINAL_BYTES);
+
+    let model_missing = !model_path.exists()
         || fs::metadata(&model_path)
             .map(|m| m.len() == 0)
-            .unwrap_or(true)
-    {
+            .unwrap_or(true);
+    let legacy_path = app_dir.join(LEGACY_MODEL_FILENAME);
+    let legacy_missing = !legacy_path.exists()
+        || fs::metadata(&legacy_path)
+            .map(|m| m.len() == 0)
+            .unwrap_or(true);
+
+    if model_missing && hw_capable {
         let _ = app.emit(
             "bootstrap-progress",
             "Downloading Qwen AI model weights (~2.1 GB)... Please wait.",
@@ -94,6 +103,25 @@ pub async fn ensure_inference_runtime(app: AppHandle) -> Result<String, String> 
             HUGGINGFACE_USER, HUGGINGFACE_REPO, MODEL_FILENAME
         );
         download_file(&client, &model_url, &model_path, &app).await?;
+    } else if model_missing {
+        let _ = app.emit(
+            "bootstrap-progress",
+            "Hardware below the recommended spec for Qwen 3B — skipping that download; using the lightweight Qwen 0.5B model instead.",
+        );
+    }
+
+    // Weak machines never download the 3B, so make sure the 0.5B fallback is
+    // present for them. Capable machines only get the 3B (saved bandwidth).
+    if legacy_missing && !hw_capable {
+        let _ = app.emit(
+            "bootstrap-progress",
+            "Downloading lightweight Qwen 0.5B model weights (~470 MB)...",
+        );
+        let legacy_url = format!(
+            "https://huggingface.co/{}/{}/resolve/main/{}",
+            HUGGINGFACE_USER, HUGGINGFACE_REPO, LEGACY_MODEL_FILENAME
+        );
+        download_file(&client, &legacy_url, &legacy_path, &app).await?;
     }
 
     let _ = app.emit(

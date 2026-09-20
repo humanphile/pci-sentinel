@@ -58,6 +58,15 @@ interface AuditRecord {
   username: string;
 }
 
+interface RuntimeModelStatus {
+  model: string;
+  reason: string; // "ok" | "hardware" | "missing"
+  sufficient: boolean;
+  ram_gb: number;
+  cores: number;
+  message: string;
+}
+
 const PCI_REQUIREMENTS = [
   { id: 1, name: "Req 1: Install & Maintain Network Security Controls" },
   { id: 2, name: "Req 2: Apply Secure Configurations to All Components" },
@@ -82,7 +91,7 @@ export default function App() {
   const [bootError, setBootError] = useState<string | null>(null);
   const [bootAttempt, setBootAttempt] = useState<number>(0);
 
-  const [selectedReqId, setSelectedReqId] = useState<number>(2);
+  const [selectedReqId, setSelectedReqId] = useState<number>(1);
   const [activeGroup, setActiveGroup] = useState<PciRequirementGroup | null>(null);
   const [activeControlIndex, setActiveControlIndex] = useState<number>(0);
   const [evidenceText, setEvidenceText] = useState<string>("");
@@ -95,13 +104,17 @@ export default function App() {
   const [verificationValid, setVerificationValid] = useState<boolean | null>(null);
   const [history, setHistory] = useState<AuditRecord[]>([]);
   const [demoUsage, setDemoUsage] = useState<{ tested_controls: string[]; quota: number } | null>(null);
-  const [resetArmed, setResetArmed] = useState(false);
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [adminPassword, setAdminPassword] = useState<string>("");
   const [isResetting, setIsResetting] = useState<boolean>(false);
+
+  // Inference runtime hardware sufficiency: which model is serving, whether the
+  // machine was downgraded, and the human-readable warning surfaced to the user.
+  const [runtimeModel, setRuntimeModel] = useState<RuntimeModelStatus | null>(null);
+  const [showHwWarning, setShowHwWarning] = useState<boolean>(false);
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [mustChangePassword, setMustChangePassword] = useState<boolean>(false);
@@ -272,8 +285,21 @@ export default function App() {
 
   useEffect(() => {
     if (isServerReady) {
-      loadRequirement(2);
+      loadRequirement(1);
       loadHistory();
+
+      // Surface runtime hardware sufficiency: which model is serving and, on
+      // machines that could not handle the 3B weights, why the 0.5B fallback
+      // was chosen. This is the "hardware" downgrade path — weak machines get a
+      // human-readable warning instead of silently degraded results.
+      invoke<RuntimeModelStatus>("get_runtime_model_status")
+        .then((status) => {
+          setRuntimeModel(status);
+          if (status.reason === "hardware") setShowHwWarning(true);
+        })
+        .catch((err) => {
+          console.error("Failed to read runtime model status:", err);
+        });
     }
   }, [isServerReady]);
 
@@ -448,31 +474,6 @@ export default function App() {
     } catch (err) {
       setStatusMessage("Consolidated export failure: " + String(err));
     }
-  };
-
-  const handleResetDemoTrial = () => {
-    // Two-step in-app confirmation: window.confirm() is a silent no-op in the
-    // macOS Tauri webview, so a native dialog would make the button appear
-    // dead. First click arms the reset, second click executes it.
-    if (!resetArmed) {
-      setResetArmed(true);
-      setStatusMessage("⚠️ Click the button again to confirm clearing the trial slots.");
-      window.setTimeout(() => setResetArmed(false), 5000);
-      return;
-    }
-    setResetArmed(false);
-    (async () => {
-      try {
-        await invoke("reset_demo_trial");
-        setCompletedAudits({});
-        setCurrentResult(null);
-        setDemoUsage(null);
-        await loadHistory();
-        setStatusMessage("✓ Demo trial reset — all requirement slots are available again.");
-      } catch (err) {
-        setStatusMessage("Reset failed: " + String(err));
-      }
-    })();
   };
 
   const handleFlushAndNextRequirement = async () => {
@@ -811,6 +812,19 @@ export default function App() {
           <div className="pane-header">
             <h2>AUDIT WIZARD</h2>
             <span className="badge-pci">Step {activeControlIndex + 1} of {totalCount}</span>
+            {runtimeModel && (
+              <span
+                className="badge-pci"
+                style={{
+                  marginLeft: "6px",
+                  color: runtimeModel.reason === "hardware" ? "#fbbf24" : runtimeModel.reason === "ok" ? "#34d399" : "#fca5a5",
+                  borderColor: runtimeModel.reason === "hardware" ? "#b45309" : runtimeModel.reason === "ok" ? "#065f46" : "#991b1b",
+                }}
+                title={runtimeModel.message}
+              >
+                {runtimeModel.reason === "hardware" ? "⚙️ 0.5B (HW fallback)" : runtimeModel.reason === "ok" ? `🧠 ${runtimeModel.model}` : "📦 Model missing"}
+              </span>
+            )}
           </div>
 
           <label className="label">Target Requirement Domain</label>
@@ -852,21 +866,6 @@ export default function App() {
               }}
             >
               <div>{demoHintText}</div>
-              <button
-                onClick={handleResetDemoTrial}
-                style={{
-                  marginTop: "8px",
-                  padding: "4px 10px",
-                  fontSize: "0.68rem",
-                  background: resetArmed ? "#7f1d1d" : "#0f172a",
-                  color: resetArmed ? "#fecaca" : "#7dd3fc",
-                  border: resetArmed ? "1px solid #ef4444" : "1px solid #0284c7",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
-              >
-                {resetArmed ? "⚠️ Confirm Reset Demo Trial?" : "↺ Reset Demo Trial Slots"}
-              </button>
             </div>
           )}
 
@@ -1267,6 +1266,52 @@ export default function App() {
           )}
         </section>
       </div>
+
+      {/* Hardware-Sufficiency Warning Overlay — shown once when the backend
+          auto-downgraded to the lightweight 0.5B model because this machine
+          does not meet the CPU/RAM threshold for the 3B weights. Informs the
+          user that results may be degraded rather than letting a weak machine
+          silently produce them. */}
+      {showHwWarning && runtimeModel && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+          backgroundColor: "rgba(2, 6, 23, 0.85)", backdropFilter: "blur(4px)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          zIndex: 9999, padding: "16px"
+        }}>
+          <div style={{
+            backgroundColor: "#0f172a", border: "1px solid #b45309", borderRadius: "12px",
+            maxWidth: "430px", width: "100%", padding: "24px", color: "#f8fafc",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.7)"
+          }}>
+            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#fbbf24", marginBottom: "12px" }}>
+              ⚠️ Insufficient Hardware Detected
+            </h3>
+            <div style={{ fontSize: "0.75rem", color: "#e2e8f0", lineHeight: "1.6", marginBottom: "16px" }}>
+              <p style={{ margin: "0 0 8px 0" }}>{runtimeModel.message}</p>
+              <div style={{ fontSize: "0.7rem", color: "#94a3b8", display: "flex", gap: "16px" }}>
+                <span>💾 RAM: {runtimeModel.ram_gb} GB</span>
+                <span>🧮 Cores: {runtimeModel.cores}</span>
+              </div>
+              <div style={{ fontSize: "0.7rem", color: "#94a3b8", marginTop: "6px" }}>
+                Using model: <strong style={{ color: "#7dd3fc" }}>{runtimeModel.model}</strong>
+              </div>
+            </div>
+            <div style={{ fontSize: "0.68rem", color: "#fbbf24", lineHeight: "1.5", padding: "10px", background: "#451a03", border: "1px solid #b45309", borderRadius: "8px", marginBottom: "16px" }}>
+              Your machine does not meet the minimum RAM/CPU required for the full
+              PCI DSS audit model, so Sentinel switched to a lighter model. Results
+              may be less precise — you can still verify one control per
+              requirement in demo trial. Consider running on a machine with at
+              least 4 physical cores and 3 GiB of overhead RAM for best accuracy.
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button className="btn-primary" onClick={() => setShowHwWarning(false)}>
+                OK, continue with the lite model
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* About Modal Overlay */}
       {showAboutModal && (
