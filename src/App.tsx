@@ -67,6 +67,18 @@ interface RuntimeModelStatus {
   message: string;
 }
 
+// Human-readable short label for the GGUF weight filename — the backend keeps
+// the full filename (that path is what actually gets downloaded/loaded), but
+// users shouldn't have to read "qwen2.5-3b-instruct-q4_k_m.gguf". Unknown
+// filenames fall back to the raw model string untouched.
+function friendlyModelLabel(model: string): string {
+  if (!model) return "";
+  const lower = model.toLowerCase();
+  if (lower.includes("3b")) return "Qwen-2.5 3B";
+  if (lower.includes("0.5b")) return "Qwen-2.5 0.5B";
+  return model;
+}
+
 const PCI_REQUIREMENTS = [
   { id: 1, name: "Req 1: Install & Maintain Network Security Controls" },
   { id: 2, name: "Req 2: Apply Secure Configurations to All Components" },
@@ -822,7 +834,7 @@ export default function App() {
                 }}
                 title={runtimeModel.message}
               >
-                {runtimeModel.reason === "hardware" ? "⚙️ 0.5B (HW fallback)" : runtimeModel.reason === "ok" ? `🧠 ${runtimeModel.model}` : "📦 Model missing"}
+                {runtimeModel.reason === "hardware" ? "⚙️ Qwen-2.5 0.5B (HW fallback)" : runtimeModel.reason === "ok" ? `🧠 ${friendlyModelLabel(runtimeModel.model)}` : "📦 Model missing"}
               </span>
             )}
           </div>
@@ -1294,7 +1306,7 @@ export default function App() {
                 <span>🧮 Cores: {runtimeModel.cores}</span>
               </div>
               <div style={{ fontSize: "0.7rem", color: "#94a3b8", marginTop: "6px" }}>
-                Using model: <strong style={{ color: "#7dd3fc" }}>{runtimeModel.model}</strong>
+                Using model: <strong style={{ color: "#7dd3fc" }}>{friendlyModelLabel(runtimeModel.model)}</strong>
               </div>
             </div>
             <div style={{ fontSize: "0.68rem", color: "#fbbf24", lineHeight: "1.5", padding: "10px", background: "#451a03", border: "1px solid #b45309", borderRadius: "8px", marginBottom: "16px" }}>
