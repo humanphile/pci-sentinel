@@ -58,7 +58,7 @@ jobs:
           PY
 
       - name: Install HF upload client (huggingface_hub)
-        run: python3 -m pip install --quiet --user huggingface_hub
+        run: python3 -m pip install --break-system-packages --quiet --user huggingface_hub
 
       - name: Download, flatten, re-archive, and publish llama.cpp CPU prebuilts
         env:
