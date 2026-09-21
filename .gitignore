@@ -3,3 +3,8 @@
 /src-tauri/target/
 .DS_Store
 *.log
+.hf-token
+
+# Option-B local scratch (never committed; installers live on HF)
+_staging/
+__pycache__/

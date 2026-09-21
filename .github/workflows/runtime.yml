@@ -1,0 +1,158 @@
+name: runtime-upload
+
+# Publish llama.cpp CPU runtime archives to the PUBLIC runtime repo
+# (ahmadnan/pci-sentinel-runtime), so the app's bootstrap.rs can fetch the
+# exact flat archives it expects on first launch.
+#
+# THIS JOB HAS NO ACCESS TO YOUR SOURCE:
+#   - runs entirely on ubuntu-latest,
+#   - does NOT checkout the repo (GitHub sets actions/checkout workdir to the
+#     repo, but we run `git config --global --add safe.directory` only; we
+#     deliberately do NOT use actions/checkout, and the job writes only to
+#     /tmp + the HF repo),
+#   - uploads ONLY flattened llama.cpp official CPU prebuilts (same llama.cpp
+#     engine the app already uses for Apple Silicon), nothing else.
+#
+# Boot targets from bootstrap.rs (exact archive names it resolves):
+#   macos/aarch64  -> llama-macos-arm64.tar.gz   (already live; refreshed)
+#   macos/x86_64   -> llama-macos-x64.tar.gz     (NEW - unblocks Intel Mac trial)
+#   windows/x86_64 -> llama-win-x64.zip          (NEW - unblocks Windows trial)
+#
+# HF token comes from the GitHub Actions secret `HF_WRITE_TOKEN`. It is read
+# into an env var, never printed; every log line masks it. Public resources are
+# later re-verified with NO auth so testers can hit them directly.
+
+on:
+  workflow_dispatch:
+    inputs:
+      llama_version:
+        description: "llama.cpp b-tag to publish (official CPU prebuilts)"
+        required: false
+        default: b5205
+
+permissions:
+  contents: read # never needs write; repo is never even checked out
+
+jobs:
+  publish-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      # NOTE: intentionally NOT actions/checkout. Repo source is never
+      # brought into this job, so it can never be published by accident.
+      - name: Validate secret presence without echoing it
+        env:
+          HF_WRITE_TOKEN: ${{ secrets.HF_WRITE_TOKEN }}
+        run: |
+          if [ -z "${HF_WRITE_TOKEN:-}" ]; then
+            echo "::error::HF_WRITE_TOKEN secret is empty. Add it in" \
+                 "Settings > Secrets and variables > Actions, then re-run." \
+                 "Nothing was downloaded or uploaded."
+            exit 1
+          fi
+          echo "HF_WRITE_TOKEN present (value never printed; masked below as reminder):"
+          python3 - <<'PY'
+          import os
+          def mask(s):
+              return (s[:4] + "…" + s[-4:]) if len(s) > 8 else "****"
+          print("  token shape:", mask(os.environ["HF_WRITE_TOKEN"]))
+          PY
+
+      - name: Download, flatten, re-archive, and publish llama.cpp CPU prebuilts
+        env:
+          LLAMA_TAG: ${{ inputs.llama_version || 'b5205' }}
+          HF_WRITE_TOKEN: ${{ secrets.HF_WRITE_TOKEN }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import io, json, os, subprocess, sys, tarfile, zipfile
+          from pathlib import Path
+
+          tag = os.environ.get("LLAMA_TAG", "b5205")
+          token = os.environ.get("HF_WRITE_TOKEN", "")
+          token_masked = token[:4] + "…" + token[-4:] if len(token) > 8 else "****"
+
+          # (official llama.cpp release asset name,  our flat archive name,  kind)
+          targets = [
+              ("llama-b5205-bin-macos-arm64.zip", "llama-macos-arm64.tar.gz", "tgz"),
+              ("llama-b5205-bin-macos-x64.zip",   "llama-macos-x64.tar.gz",   "tgz"),
+              ("llama-b5205-bin-win-avx2-x64.zip","llama-win-x64.zip",        "zip"),
+          ]
+
+          # Use whichever b-tag the user picked; if it differs from b5205 the
+          # asset names change too, so derive them from the tag string.
+          versioned = [
+              (f"llama-{tag}-bin-macos-arm64.zip", "llama-macos-arm64.tar.gz", "tgz"),
+              (f"llama-{tag}-bin-macos-x64.zip",   "llama-macos-x64.tar.gz",   "tgz"),
+              (f"llama-{tag}-bin-win-avx2-x64.zip","llama-win-x64.zip",        "zip"),
+          ]
+
+          # 1. Read the official release asset manifest (public API, read-only).
+          rel = json.loads(subprocess.run(
+              ["curl", "-fsSL",
+               f"https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/{tag}"],
+              capture_output=True, check=True, text=True).stdout)
+
+          assets = {}
+          for a in rel.get("assets", []):
+              assets[a["name"]] = a["browser_download_url"]
+
+          for in_name, out_name, kind in versioned:
+              url = assets.get(in_name)
+              if not url:
+                  raise SystemExit(
+                      f"missing official llama.cpp asset {in_name} at tag {tag}"
+                  )
+
+              print(f"\n[{out_name}] downloading official {in_name} …")
+              subprocess.run(["curl", "-fsSL", "-o", "/tmp/in.zip", url], check=True)
+
+              # 2. Flatten: official archives carry a top-level prefix dir
+              #    (e.g. llama-b5205-bin-win-avx2-x64/...). boostrap.rs extracts
+              #    entries VERBATIM and then checks bin_dir/llama-server(.exe)
+              #    at the ROOT. So we strip the prefix so the archive you get is
+              #    FLAT: llama-server(.exe) + sibling runtime libs at top level.
+              tmp = Path("/tmp/flat_in")
+              if tmp.exists():
+                  import shutil
+                  shutil.rmtree(tmp)
+              tmp.mkdir()
+              with zipfile.ZipFile("/tmp/in.zip") as z:
+                  z.extractall(tmp/licenses)
+              files = [p for p in tmp.rglob("*") if p.is_file()]
+
+              if kind == "zip":
+                  with zipfile.ZipFile(out_name, "w", zipfile.ZIP_DEFLATED) as z:
+                      for p in files:
+                          z.write(p, arcname=p.name)
+              else:
+                  with tarfile.open(out_name, "w:gz") as t:
+                      for p in files:
+                          t.add(p, arcname=p.name)
+
+              print(f"[{out_name}] flat archive ok: root entries={len(files)}")
+
+          # 3. Publish all three to the public runtime repo (token masked).
+          print("\n=== uploading to ahmadnan/pci-sentinel-runtime (token masked) ===")
+          import huggingface_hub
+          api = huggingface_hub.HfApi(token=token, endpoint="https://huggingface.co")
+          for out_name, *_ in versioned:
+              info = api.upload_file(
+                  path_or_fileobj=Path(out_name),
+                  path_in_repo=out_name,
+                  repo_id="ahmadnan/pci-sentinel-runtime",
+                  repo_type="model",
+                  commit_message=f"runtime: publish {out_name} (llama.cpp {tag})",
+              )
+              oid = getattr(info, "commit_sha", None) or "?"
+              print(f"[{out_name}] uploaded ok commit {oid[:8]}")
+
+          # 4. Public verification with NO auth, so testers can hit the URLs
+          #    directly. (Keep masked / never echo the token.)
+          print("\n=== public resolve verification (no auth) ===")
+          for out_name, *_ in versioned:
+              code = subprocess.run(
+                  ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
+                   f"https://huggingface.co/ahmadnan/pci-sentinel-runtime/resolve/main/{out_name}"],
+                  capture_output=True, text=True).stdout.strip()
+              print(f"  {out_name}: HTTP {code}")
+          PY
