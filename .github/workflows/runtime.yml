@@ -117,7 +117,7 @@ jobs:
                   shutil.rmtree(tmp)
               tmp.mkdir()
               with zipfile.ZipFile("/tmp/in.zip") as z:
-                  z.extractall(tmp/licenses)
+                  z.extractall(tmp)
               files = [p for p in tmp.rglob("*") if p.is_file()]
 
               if kind == "zip":
