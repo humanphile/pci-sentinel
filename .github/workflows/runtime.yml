@@ -107,7 +107,7 @@ jobs:
                   )
 
               print(f"\n[{out_name}] downloading official {in_name} …")
-              subprocess.run(["curl", "-fsSL", "-o", "/tmp/in.zip", url], check=True)
+              subprocess.run(["curl", "-fsSL", "--retry", "4", "--retry-all-errors", "--retry-delay", "3", "--retry-connrefused", "-o", "/tmp/in.zip", url], check=True)
 
               # 2. Flatten: official archives carry a top-level prefix dir
               #    (e.g. llama-b5205-bin-win-avx2-x64/...). boostrap.rs extracts
