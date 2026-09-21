@@ -57,6 +57,9 @@ jobs:
           print("  token shape:", mask(os.environ["HF_WRITE_TOKEN"]))
           PY
 
+      - name: Install HF upload client (huggingface_hub)
+        run: python3 -m pip install --quiet --user huggingface_hub
+
       - name: Download, flatten, re-archive, and publish llama.cpp CPU prebuilts
         env:
           LLAMA_TAG: ${{ inputs.llama_version || 'b5205' }}
