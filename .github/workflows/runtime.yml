@@ -138,7 +138,7 @@ jobs:
           print("\n=== uploading to ahmadnan/pci-sentinel-runtime (token masked) ===")
           import huggingface_hub
           api = huggingface_hub.HfApi(token=token, endpoint="https://huggingface.co")
-          for out_name, *_ in versioned:
+          for _, out_name, _ in versioned:
               info = api.upload_file(
                   path_or_fileobj=Path(out_name),
                   path_in_repo=out_name,
@@ -152,7 +152,7 @@ jobs:
           # 4. Public verification with NO auth, so testers can hit the URLs
           #    directly. (Keep masked / never echo the token.)
           print("\n=== public resolve verification (no auth) ===")
-          for out_name, *_ in versioned:
+          for _, out_name, _ in versioned:
               code = subprocess.run(
                   ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
                    f"https://huggingface.co/ahmadnan/pci-sentinel-runtime/resolve/main/{out_name}"],
