@@ -103,6 +103,11 @@ export default function App() {
   const [bootError, setBootError] = useState<string | null>(null);
   const [bootAttempt, setBootAttempt] = useState<number>(0);
 
+  // Launch checkpoint + progress fed ONLY by bootstrap.rs's own emit vocabulary
+  // (checkpoint: 1=runtime asset, 2=model weights, 3=model loaded; pct 0-100).
+  const [bootCheckpoint, setBootCheckpoint] = useState<number>(0);
+  const [bootProgressPct, setBootProgressPct] = useState<number>(0);
+
   const [selectedReqId, setSelectedReqId] = useState<number>(1);
   const [activeGroup, setActiveGroup] = useState<PciRequirementGroup | null>(null);
   const [activeControlIndex, setActiveControlIndex] = useState<number>(0);
@@ -158,6 +163,40 @@ export default function App() {
   const [isFlushing, setIsFlushing] = useState<boolean>(false);
   
 // ====================================================================================
+
+  // Surface real checkpoints → progress bar (bootstrap.rs emits these exact
+  // checkpoint strings; mapping to checkpoint # + pct ONLY from that vocabulary).
+  useEffect(() => {
+    if (!isTauri()) return;
+    let unlisten: (() => void) | undefined;
+    let cancelled = false;
+    (async () => {
+      const un = await listen<string>("bootstrap-progress", (event) => {
+        if (cancelled || !event.payload) return;
+        const msg = event.payload;
+        const em = /Valid local secure runtime found\.|Downloading runtime for/;
+        const mm = /model weights|Qwen AI model|lightweight Qwen|0\.5B|Válida|weights/;
+        if (em.test(msg) || /runtime/.test(msg)) {
+          setBootCheckpoint(1);
+          setBootProgressPct(35);
+        }
+        if (mm.test(msg) || /model/.test(msg)) {
+          setBootCheckpoint(2);
+          setBootProgressPct(75);
+        }
+        if (/Starting local inference server|enclave ready|secure runtime ready|Server ready|accept connections/.test(msg)) {
+          setBootCheckpoint(3);
+          setBootProgressPct(100);
+        }
+      });
+      if (cancelled) un();
+      else unlisten = un;
+    })();
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
+  }, []);
 
   // Surface fatal runtime bootstrap failures from the Rust side (download
   // errors, missing runtime assets, server spawn failures).
@@ -708,6 +747,17 @@ export default function App() {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#020617', color: '#f8fafc', fontFamily: 'sans-serif' }}>
         {!bootError ? (
           <>
+            {/* Real bootstrap.checkpoint-derived progress: each UI breakdown state is fed by bootstrap.rs's own emitted "bootstrap-progress" strings, never invented. */}
+            <div className="boot-progress" role="progressbar" aria-label="Runtime + model bootstrap progress">
+              <div className="boot-progress-track" data-checkpoint={bootCheckpoint}>
+                <div className="boot-progress-fill" style={{ width: bootProgressPct + "%" }} />
+              </div>
+              <div className="boot-checkpoints">
+                <span className={bootCheckpoint >= 1 ? "cp-done" : ""}>① Runtime asset</span>
+                <span className={bootCheckpoint >= 2 ? "cp-done" : ""}>② Model weights</span>
+                <span className={bootCheckpoint >= 3 ? "cp-done" : ""}>③ Model loaded</span>
+              </div>
+            </div>
             <div style={{ width: '48px', height: '48px', border: '4px solid #1e293b', borderTop: '4px solid #38bdf8', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
             <h2 style={{ marginTop: '24px', fontSize: '1.25rem', letterSpacing: '1px', color: '#38bdf8' }}>SENTINEL GRC SECURE ENCLAVE</h2>
             <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '8px', maxWidth: '400px', textAlign: 'center', lineHeight: '1.4' }}>{bootStatusMsg}</p>
